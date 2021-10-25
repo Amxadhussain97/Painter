@@ -5,11 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use http\Env\Response;
 use Illuminate\Http\Request;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
-use Ferdous\OtpValidator\Object\OtpRequestObject;
-use Ferdous\OtpValidator\OtpValidator;
-use Ferdous\OtpValidator\Object\OtpValidateRequestObject;
 
 
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Insurance;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\In;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use File;
 
 

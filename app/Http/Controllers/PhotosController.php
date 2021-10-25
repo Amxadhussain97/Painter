@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gallery;
 use App\Models\Photo;
 use Illuminate\Http\Request;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use File;
 
 

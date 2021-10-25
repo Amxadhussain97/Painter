@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Eptool;
 use Illuminate\Http\Request;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 
 class EptoolController extends Controller
@@ -14,7 +14,7 @@ class EptoolController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($request)
     {
         $tool_query = Eptool::with('epcategory');
 
@@ -183,7 +183,7 @@ class EptoolController extends Controller
             'epcategory_id' => 'required|exists:epcategories,id'
 
         ];
-        $validator = Validator::make($request->all(),$rule3s);
+        $validator = Validator::make($request->all(),$rules);
         if($validator->fails()){
             return response()->json($validator->errors(),401);
         }
