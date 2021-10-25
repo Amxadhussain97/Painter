@@ -204,8 +204,9 @@ class GalleryController extends Controller
         }
         if(isset($photo['image_id']))
         {
-            $path = public_path()."/Photos/".$photo->name;
+            $path = public_path()."/Photos/".$photo->image_id;
             unlink($path);
+
         }
         $file = $request->file('image_id');
         $filename = time().'.'.$file->extension();
