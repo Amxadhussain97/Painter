@@ -14,32 +14,33 @@ class GalleryController extends Controller
     public function getUserPhotos(Request $request, $galleryId)
     {
 
-        $photos  = Photo::where('gallery_id',$galleryId)->get();
-        if($photos->isEmpty()){
-            return response()->json(["message" => "No photo available"],404);
+        $photos  = Photo::where('gallery_id', $galleryId)->get();
+        if ($photos->isEmpty()) {
+            return response()->json(["message" => "No photo available"], 404);
         }
-        return response()->json( [
-            'message' => 'success',
-            'photos' => $photos
-        ],
-            200);
+        return response()->json(
+            [
+                'message' => 'success',
+                'photos' => $photos
+            ],
+            200
+        );
     }
 
     public function getGalleries(Request $request)
     {
         $userId = auth()->user()->id;
-        $galleries  =  Gallery::where('user_id',$userId)->get('name');
-        if($galleries->isEmpty()){
-            return response()->json(["message" => "No content found"],404);
+        $galleries  =  Gallery::where('user_id', $userId)->get('name');
+        if ($galleries->isEmpty()) {
+            return response()->json(["message" => "No content found"], 404);
         }
         return response()->json([
             "message" => "Success",
             "Galleries" => $galleries,
-        ],200);
-
+        ], 200);
     }
 
-    public function postUserPhoto(Request $request,$galleryId)
+    public function postUserPhoto(Request $request, $galleryId)
     {
         $gallery = Gallery::find($galleryId);
 
@@ -47,32 +48,31 @@ class GalleryController extends Controller
             'image_id' => $request->image_id,
             'gallery_id' => $galleryId,
         ];
-        $validator = Validator::make($r,
+        $validator = Validator::make(
+            $r,
             [
                 'image_id' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'gallery_id' => 'required|exists:galleries,id',
 
-            ]);
-        if ($validator->fails() || is_null($gallery )) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            ]
+        );
+        if ($validator->fails() || is_null($gallery)) {
+            return response()->json(['error' => $validator->errors()], 401);
         }
 
         $photo = new Photo();
-        if($request->file('image_id'))
-        {
+        if ($request->file('image_id')) {
             $file = $request->file('image_id');
-            $filename = time().'.'.$file->extension();
-            $file->move(public_path('Photos'),$filename);
-            $photo->image_id= $filename;
+            $filename = time() . '.' . $file->extension();
+            $file->move(public_path('Photos'), $filename);
+            $photo->image_id = $filename;
         }
         $photo->gallery_id = $galleryId;
         $photo->save();
         return response()->json([
             "message" => "Success",
-            "Photo"=> $photo
-        ],201);
-
-
+            "Photo" => $photo
+        ], 201);
     }
 
     public function postGallery(Request $request)
@@ -82,13 +82,15 @@ class GalleryController extends Controller
             'name' => $request->name,
             'user_id' => $userId,
         ];
-        $validator = Validator::make($r,
+        $validator = Validator::make(
+            $r,
             [
                 'name' => 'required|max:255|min:3',
                 'user_id' => 'required|exists:users,id',
-            ]);
+            ]
+        );
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            return response()->json(['error' => $validator->errors()], 401);
         }
         $gallery = new Gallery();
         $gallery->name = $request->name;
@@ -98,12 +100,12 @@ class GalleryController extends Controller
         return response()->json([
             "message" => "Success",
             "Gallery" => $gallery->name
-        ],201);
+        ], 201);
     }
 
 
 
-    public function index(Request $request,$id)
+    public function index(Request $request, $id)
     {
         $galleries = Gallery::where('user_id', $id)->get();
         if ($galleries->isEmpty()) {
@@ -129,11 +131,13 @@ class GalleryController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(),
+        $validator = Validator::make(
+            $request->all(),
             [
                 'name' => 'required|max:255|min:3',
                 'user_id' => 'required|exists:users,id',
-            ]);
+            ]
+        );
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 401);
         }
@@ -159,64 +163,60 @@ class GalleryController extends Controller
      */
 
 
-    public function updateGallery(Request $request,$galleryId)
+    public function updateGallery(Request $request, $galleryId)
     {
         $userId = auth()->user()->id;
         $gallery = Gallery::find($galleryId);
 
-        if(is_null($gallery ) || $gallery->user_id != $userId ){
-            return response()->json(["message" => "Record Not Found!"],404);
+        if (is_null($gallery) || $gallery->user_id != $userId) {
+            return response()->json(["message" => "Record Not Found!"], 404);
         }
         $rules = [
             'name' => 'required|max:255|min:3'
         ];
 
-        $validator = Validator::make($request->all(),$rules);
-        if($validator->fails()){
-            return response()->json($validator->errors(),400);
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
         }
         $gallery->name = $request->name;
         $gallery->save();
         return response()->json([
             "message" => "Updated Successfully",
-            ],201);
-
+        ], 201);
     }
 
 
-    public function updateUserPhoto(Request $request, $galleryId,$photoId)
+    public function updateUserPhoto(Request $request, $galleryId, $photoId)
     {
         $gallery = Gallery::find($galleryId);
         $photo = Photo::find($photoId);
 
-        if(is_null($photo) || $photo->gallery_id != $galleryId || is_null($gallery)){
-            return response()->json(["message" => "Record Not Found!"],404);
+        if (is_null($photo) || $photo->gallery_id != $galleryId || is_null($gallery)) {
+            return response()->json(["message" => "Record Not Found!"], 404);
         }
 
         $rules = [
             'image_id' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
 
-        $validator = Validator::make($request->all(),$rules);
+        $validator = Validator::make($request->all(), $rules);
 
-        if($validator->fails()){
-            return response()->json($validator->errors(),400);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
         }
-        if(isset($photo['image_id']))
-        {
-            $path = public_path()."/Photos/".$photo->image_id;
+        if (isset($photo['image_id'])) {
+            $path = public_path() . "/Photos/" . $photo->image_id;
             unlink($path);
-
         }
         $file = $request->file('image_id');
-        $filename = time().'.'.$file->extension();
-        $file->move(public_path('Photos'),$filename);
+        $filename = time() . '.' . $file->extension();
+        $file->move(public_path('Photos'), $filename);
         $photo->image_id = $filename;
         $photo->save();
         return response()->json([
             "message" => "Updated Successfully"
-        ],201);
-
+        ], 201);
     }
 
 
@@ -231,46 +231,41 @@ class GalleryController extends Controller
         $userId = auth()->user()->id;
         $gallery = Gallery::find($galleryId);
 
-        if(is_null($gallery) || $gallery->user_id != $userId){
-            return response()->json(["message" => "Record Not Found!"],404);
+        if (is_null($gallery) || $gallery->user_id != $userId) {
+            return response()->json(["message" => "Record Not Found!"], 404);
         }
 
 
-        $photo_query = Photo::where('gallery_id',$galleryId);
+        $photo_query = Photo::where('gallery_id', $galleryId);
         $photos = $photo_query->get();
-        foreach ($photos as $photo)
-        {
-            if(isset($photo['name']))
-            {
-                $path = public_path()."/Photos/".$photo->name;
+        foreach ($photos as $photo) {
+            if (isset($photo['name'])) {
+                $path = public_path() . "/Photos/" . $photo->name;
                 unlink($path);
             }
         }
 
         $photo_query->delete();
         $gallery->delete();
-        return response()->json(["message"=>"Deleted"],200);
+        return response()->json(["message" => "Deleted"], 200);
     }
 
 
 
-    public function deleteUserPhoto($galleryId,$photoId)
+    public function deleteUserPhoto($galleryId, $photoId)
     {
         $gallery = Gallery::find($galleryId);
         $photo = Photo::find($photoId);
 
-        if(is_null($photo) || $photo->gallery_id != $galleryId || is_null($gallery)){
-            return response()->json(["message" => "Record Not Found!"],404);
+        if (is_null($photo) || $photo->gallery_id != $galleryId || is_null($gallery)) {
+            return response()->json(["message" => "Record Not Found!"], 404);
         }
 
-        if(isset($photo['image_id']))
-        {
-            $path = public_path()."/Photos/".$photo->name;
+        if (isset($photo['image_id'])) {
+            $path = public_path() . "/Photos/" . $photo->image_id;
             unlink($path);
         }
         $photo->delete();
-        return response()->json(["messege" =>"Deleted successfully"],200);
+        return response()->json(["messege" => "Deleted successfully"], 200);
     }
-
-
 }

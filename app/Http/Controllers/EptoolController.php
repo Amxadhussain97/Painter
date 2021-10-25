@@ -147,7 +147,7 @@ class EptoolController extends Controller
 
         $eptools = Eptool::select(['name', 'image_id', 'amount', 'model'])->where('user_id', $userId)->get();
         if ($eptools->isEmpty()) {
-            return response()->json(["message" => "This User Doesn't have any Insurences"], 404);
+            return response()->json(["message" => "This User Doesn't have any Eptools"], 404);
         }
 
         return response()->json(
