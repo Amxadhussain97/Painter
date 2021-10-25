@@ -114,7 +114,7 @@ class InsuranceController extends Controller
                 "message" => "Updated Successfully",
                 "insurance" => $insurance->name,
             ],
-            200
+            204
         );
     }
 
@@ -141,6 +141,6 @@ class InsuranceController extends Controller
         $insurance->delete();
         return response()->json([
             "message" => "Deleted successfully"
-        ], 201);
+        ], 204);
     }
 }

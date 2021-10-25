@@ -71,7 +71,7 @@ class GalleryController extends Controller
         $photo->save();
         return response()->json([
             "message" => "Success",
-            "Photo" => $photo
+
         ], 201);
     }
 
@@ -183,7 +183,7 @@ class GalleryController extends Controller
         $gallery->save();
         return response()->json([
             "message" => "Updated Successfully",
-        ], 201);
+        ], 204);
     }
 
 
@@ -216,7 +216,7 @@ class GalleryController extends Controller
         $photo->save();
         return response()->json([
             "message" => "Updated Successfully"
-        ], 201);
+        ], 204);
     }
 
 
@@ -247,7 +247,7 @@ class GalleryController extends Controller
 
         $photo_query->delete();
         $gallery->delete();
-        return response()->json(["message" => "Deleted"], 200);
+        return response()->json(["message" => "Deleted"], 204);
     }
 
 
@@ -266,6 +266,6 @@ class GalleryController extends Controller
             unlink($path);
         }
         $photo->delete();
-        return response()->json(["messege" => "Deleted successfully"], 200);
+        return response()->json(["messege" => "Deleted successfully"], 204);
     }
 }

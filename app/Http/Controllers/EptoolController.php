@@ -137,7 +137,7 @@ class EptoolController extends Controller
         $eptool->save();
         return response()->json([
             "message" => 'Updated Successfully',
-        ], 200);
+        ], 204);
     }
 
     public function getEptool()
@@ -175,7 +175,7 @@ class EptoolController extends Controller
         $eptool->delete();
         return response()->json([
             "messsage" => "Deleted successfully"
-        ], 201);
+        ], 204);
     }
 
 

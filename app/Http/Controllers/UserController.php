@@ -31,8 +31,8 @@ class UserController extends Controller
 
 
         ];
-        $validator = Validator::make($request->all(),$rules);
-        if($validator->fails()) {
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
             return response()->json($validator->errors(), 401);
         }
         $user = new User();
@@ -41,26 +41,24 @@ class UserController extends Controller
         $user->save();
         return response()->json([
             "message" => "User registered successfully"
-        ],200);
-
+        ], 201);
     }
 
     //User Login Api -POST
     public function login(Request $request)
     {
         //validation
-       $request->validate([
-          "email" => "required|email",
-          "password" => "required"
-       ]);
+        $request->validate([
+            "email" => "required|email",
+            "password" => "required"
+        ]);
 
-       // verify user +token
+        // verify user +token
 
-        if(!$token = auth()->attempt(["email" => $request->email, "password"  => $request->password]))
-        {
+        if (!$token = auth()->attempt(["email" => $request->email, "password"  => $request->password])) {
             return response()->json([
-                   "message" => "Invalid credentials"
-            ],401);
+                "message" => "Invalid credentials"
+            ], 401);
         }
 
         //return response
@@ -69,9 +67,7 @@ class UserController extends Controller
 
             "message" => "Login Successful",
             "access_token" => $token
-        ]);
-
-
+        ], 201);
     }
 
     //User Profile Api -GET
@@ -82,17 +78,17 @@ class UserController extends Controller
         return response()->json([
             "message" => "User Profile data",
             "data" => $user_data
-        ]);
+        ], 201);
     }
 
     //User Logout Api -GET
     public function logout()
     {
-       auth()->logout();
+        auth()->logout();
 
-       return response()->json([
-           "message" => "User logged out"
-       ]);
+        return response()->json([
+            "message" => "User logged out"
+        ], 200);
     }
 
 
@@ -101,8 +97,8 @@ class UserController extends Controller
     public function updateProfile(Request $request)
     {
         $user = User::find(auth()->user()->id);
-        if(is_null($user)){
-            return response()->json(["message" => "Record Not Found!"],404);
+        if (is_null($user)) {
+            return response()->json(["message" => "Record Not Found!"], 404);
         }
 
 
@@ -120,25 +116,24 @@ class UserController extends Controller
             'role' => 'max:10|min:4',
 
         ];
-        $validator = Validator::make($request->all(),$rules);
-        if($validator->fails()) {
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
             return response()->json($validator->errors(), 401);
         }
-        if($request->file('imagePath')) {
+        if ($request->file('imagePath')) {
 
-            if($user->imagePath) {
+            if ($user->imagePath) {
                 $path = public_path() . "/Gallery/" . $user->imagePath;
                 unlink($path);
             }
             $file = $request->file('imagePath');
-            $filename = time().'.'.$file->extension();
-            $file->move(public_path('Gallery'),$filename);
-            $user->imagePath= $filename;
+            $filename = time() . '.' . $file->extension();
+            $file->move(public_path('Gallery'), $filename);
+            $user->imagePath = $filename;
         }
         $user->update($request->except('imagePath'));
         return response()->json([
             "message" => "Updated Successfully"
-        ],201);
+        ], 204);
     }
-
 }
