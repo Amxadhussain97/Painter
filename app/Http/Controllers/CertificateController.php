@@ -143,7 +143,7 @@ class CertificateController extends Controller
         $certificate->save();
         return response()->json([
             "message" => 'Updated Successfully',
-        ], 200);
+        ], 204);
     }
 
     /**
@@ -167,6 +167,6 @@ class CertificateController extends Controller
         $certificate->delete();
         return response()->json([
             "messsage" => "Deleted successfully"
-        ], 201);
+        ], 204);
     }
 }
