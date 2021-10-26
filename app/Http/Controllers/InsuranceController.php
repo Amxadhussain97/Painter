@@ -16,9 +16,9 @@ class InsuranceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getInsurances()
+    public function getInsurances($request)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $insurances = Insurance::select('name')->where('user_id', $userId)->get();
         if ($insurances->isEmpty()) {
             return response()->json(["message" => "This User Doesn't have any Insurances"], 404);
@@ -33,7 +33,7 @@ class InsuranceController extends Controller
 
     public function postInsurance(Request $request)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
 
         $r = [
             'name' => $request->name,
@@ -80,7 +80,7 @@ class InsuranceController extends Controller
 
     public function updateInsurance(Request $request, $insuranceId)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $insurance = Insurance::find($insuranceId);
 
         if (is_null($insurance) || $insurance->user_id != $userId) {
@@ -124,9 +124,9 @@ class InsuranceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function deleteInsurance($insuranceId)
+    public function deleteInsurance($request, $insuranceId)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
 
         $insurance = Insurance::find($insuranceId);
 

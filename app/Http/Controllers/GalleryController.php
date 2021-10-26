@@ -29,7 +29,7 @@ class GalleryController extends Controller
 
     public function getGalleries(Request $request)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $galleries  =  Gallery::where('user_id', $userId)->get('name');
         if ($galleries->isEmpty()) {
             return response()->json(["message" => "No content found"], 404);
@@ -78,7 +78,7 @@ class GalleryController extends Controller
 
     public function postGallery(Request $request)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $r = [
             'name' => $request->name,
             'user_id' => $userId,
@@ -166,7 +166,7 @@ class GalleryController extends Controller
 
     public function updateGallery(Request $request, $galleryId)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $gallery = Gallery::find($galleryId);
 
         if (is_null($gallery) || $gallery->user_id != $userId) {
@@ -227,9 +227,9 @@ class GalleryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function deleteGallery($galleryId)
+    public function deleteGallery($request, $galleryId)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $gallery = Gallery::find($galleryId);
 
         if (is_null($gallery) || $gallery->user_id != $userId) {

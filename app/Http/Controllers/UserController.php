@@ -123,12 +123,12 @@ class UserController extends Controller
         if ($request->file('imagePath')) {
 
             if ($user->imagePath) {
-                $path = public_path() . "/Gallery/" . $user->imagePath;
+                $path = public_path() . "/Photos/" . $user->imagePath;
                 unlink($path);
             }
             $file = $request->file('imagePath');
             $filename = time() . '.' . $file->extension();
-            $file->move(public_path('Gallery'), $filename);
+            $file->move(public_path('Photos'), $filename);
             $user->imagePath = $filename;
         }
         $user->update($request->except('imagePath'));

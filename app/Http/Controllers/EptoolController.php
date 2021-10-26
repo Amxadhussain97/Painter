@@ -54,7 +54,7 @@ class EptoolController extends Controller
 
     public function postEptool(Request $request)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
 
         $r = [
             'name' => $request->name,
@@ -103,7 +103,7 @@ class EptoolController extends Controller
 
     public function updateEptool(Request $request, $eptoolId)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $eptool = Eptool::find($eptoolId);
         if (is_null($eptool) || $eptool->user_id != $userId) {
             return response()->json(["message" => "Record Not Found!"], 404);
@@ -140,9 +140,9 @@ class EptoolController extends Controller
         ], 204);
     }
 
-    public function getEptool()
+    public function getEptools($request)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
 
 
         $eptools = Eptool::select(['name', 'image_id', 'amount', 'model'])->where('user_id', $userId)->get();
@@ -160,9 +160,9 @@ class EptoolController extends Controller
     }
 
 
-    public function deleteEptool($eptoolId)
+    public function deleteEptool($request,$eptoolId)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $eptool = Eptool::find($eptoolId);
 
         if (is_null($eptool) || $eptool->user_id != $userId) {

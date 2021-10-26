@@ -16,9 +16,9 @@ class CertificateController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getCertificate()
+    public function getCertificates($request)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
 
 
         $certificates = Certificate::select('name')->where('user_id', $userId)->get();
@@ -42,7 +42,7 @@ class CertificateController extends Controller
 
     public function postCertificate(Request $request)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
 
         $r = [
             'name' => $request->name,
@@ -113,7 +113,7 @@ class CertificateController extends Controller
      */
     public function updateCertificate(Request $request, $certificateId)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $certificate = Certificate::find($certificateId);
         if (is_null($certificate) || $certificate->user_id != $userId) {
             return response()->json(["message" => "Record Not Found!"], 404);
@@ -152,9 +152,9 @@ class CertificateController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function deleteCertificate($certificateId)
+    public function deleteCertificate($request, $certificateId)
     {
-        $userId = auth()->user()->id;
+        $userId = $request->user_id;
         $certificate = Certificate::find($certificateId);
 
         if (is_null($certificate) || $certificate->user_id != $userId) {
