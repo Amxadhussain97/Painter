@@ -78,7 +78,7 @@ class UserController extends Controller
         return response()->json([
             "message" => "User Profile data",
             "data" => $user_data
-        ], 201);
+        ], 200);
     }
 
     //User Logout Api -GET
