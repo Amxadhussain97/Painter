@@ -94,7 +94,7 @@ class EptoolController extends Controller
         return response()->json(
             [
                 "message" => "Success",
-                "eptools" => $eptool->name
+                "eptools" => $eptool->makeHidden(['user_id'])
             ],
             201
         );

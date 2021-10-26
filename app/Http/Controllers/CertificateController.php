@@ -76,7 +76,7 @@ class CertificateController extends Controller
         return response()->json(
             [
                 "message" => "Success",
-                "certificate" => $certificate->name
+                "certificate" => $certificate->makeHidden(['user_id'])
             ],
             201
         );

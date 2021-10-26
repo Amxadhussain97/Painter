@@ -64,7 +64,7 @@ class InsuranceController extends Controller
         $insurance->save();
         return response()->json([
             "message" => "Success",
-            "Insurance" => $insurance->name
+            "Insurance" => $insurance->makeHidden(['user_id'])
         ], 201);
     }
 

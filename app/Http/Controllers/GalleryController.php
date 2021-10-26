@@ -71,6 +71,7 @@ class GalleryController extends Controller
         $photo->save();
         return response()->json([
             "message" => "Success",
+            "photo" => $photo,
 
         ], 201);
     }
@@ -99,7 +100,7 @@ class GalleryController extends Controller
 
         return response()->json([
             "message" => "Success",
-            "Gallery" => $gallery->name
+            "Gallery" => $gallery->makeHidden(['user_id'])
         ], 201);
     }
 
