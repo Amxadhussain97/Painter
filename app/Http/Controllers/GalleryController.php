@@ -65,7 +65,7 @@ class GalleryController extends Controller
             $file = $request->file('image_id');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Photos'), $filename);
-            $photo->image_id = $filename;
+            $photo->image_id = 'Photos/' . $filename;
         }
         $photo->gallery_id = $galleryId;
         $photo->save();
@@ -207,13 +207,13 @@ class GalleryController extends Controller
             return response()->json($validator->errors(), 400);
         }
         if (isset($photo['image_id'])) {
-            $path = public_path() . "/Photos/" . $photo->image_id;
+            $path = public_path() . "/" . $photo->image_id;
             unlink($path);
         }
         $file = $request->file('image_id');
         $filename = time() . '.' . $file->extension();
         $file->move(public_path('Photos'), $filename);
-        $photo->image_id = $filename;
+        $photo->image_id = 'Photos/' . $filename;
         $photo->save();
         return response()->json([
             "message" => "Updated Successfully"
@@ -263,7 +263,7 @@ class GalleryController extends Controller
         }
 
         if (isset($photo['image_id'])) {
-            $path = public_path() . "/Photos/" . $photo->image_id;
+            $path = public_path() . "/" . $photo->image_id;
             unlink($path);
         }
         $photo->delete();

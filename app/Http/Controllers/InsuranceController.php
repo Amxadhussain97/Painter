@@ -56,7 +56,7 @@ class InsuranceController extends Controller
             $file = $request->file('file_id');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Insurances'), $filename);
-            $insurance->file_id = $filename;
+            $insurance->file_id = 'Insurances/' . $filename;
         }
 
         $insurance->name = $request->name;
@@ -98,13 +98,13 @@ class InsuranceController extends Controller
 
         if ($request->file('file_id')) {
             if (isset($insurance['file_id'])) {
-                $path = public_path() . "/Insurances/" . $insurance->file_id;
+                $path = public_path() . "/" . $insurance->file_id;
                 unlink($path);
             }
             $file = $request->file('file_id');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Insurances'), $filename);
-            $insurance->file_id = $filename;
+            $insurance->file_id = 'Insurances/' . $filename;
         }
         $insurance->name = is_null($request->name) ? $insurance->name : $request->name;
 
@@ -135,7 +135,7 @@ class InsuranceController extends Controller
         }
 
         if (isset($insurance['file_id'])) {
-            $path = public_path() . "/Insurances/" . $insurance->file_id;
+            $path = public_path() . "/" . $insurance->file_id;
             unlink($path);
         }
         $insurance->delete();

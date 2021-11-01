@@ -39,8 +39,9 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
         $user->save();
+        $token = auth()->attempt(["email" => $request->email, "password"  => $request->password]);
         return response()->json([
-            "message" => "User registered successfully"
+            "token" => $token
         ], 201);
     }
 
@@ -48,6 +49,7 @@ class UserController extends Controller
     public function login(Request $request)
     {
         //validation
+
         $request->validate([
             "email" => "required|email",
             "password" => "required"
@@ -96,6 +98,7 @@ class UserController extends Controller
 
     public function updateProfile(Request $request)
     {
+// return public_path();
         $user = User::find(auth()->user()->id);
         if (is_null($user)) {
             return response()->json(["message" => "Record Not Found!"], 404);
@@ -123,13 +126,13 @@ class UserController extends Controller
         if ($request->file('imagePath')) {
 
             if ($user->imagePath) {
-                $path = public_path() . "/Photos/" . $user->imagePath;
+                $path = public_path() . "/" . $user->imagePath;
                 unlink($path);
             }
             $file = $request->file('imagePath');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Photos'), $filename);
-            $user->imagePath = $filename;
+            $user->imagePath = "Photos/".$filename;
         }
         $user->update($request->except('imagePath'));
         return response()->json([

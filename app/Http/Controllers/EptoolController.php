@@ -83,7 +83,7 @@ class EptoolController extends Controller
             $file = $request->file('image_id');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Eptools'), $filename);
-            $eptool->image_id = $filename;
+            $eptool->image_id = 'Eptools/' . $filename;
         }
 
         $eptool->name = $request->name;
@@ -123,13 +123,13 @@ class EptoolController extends Controller
 
         if ($request->file('image_id')) {
             if (isset($eptool['image_id'])) {
-                $path = public_path() . "/Eptools/" . $eptool->image_id;
+                $path = public_path() . "/" . $eptool->image_id;
                 unlink($path);
             }
             $file = $request->file('image_id');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Eptools'), $filename);
-            $eptool->image_id = $filename;
+            $eptool->image_id = 'Eptools/' . $filename;
         }
         $eptool->name = is_null($request->name) ? $eptool->name : $request->name;
         $eptool->model = is_null($request->model) ? $eptool->model : $request->model;
@@ -160,7 +160,7 @@ class EptoolController extends Controller
     }
 
 
-    public function deleteEptool($request,$eptoolId)
+    public function deleteEptool($request, $eptoolId)
     {
         $userId = $request->user_id;
         $eptool = Eptool::find($eptoolId);
@@ -169,7 +169,7 @@ class EptoolController extends Controller
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         if (isset($eptoole['image_id'])) {
-            $path = public_path() . "/Eptools/" . $eptool->file_id;
+            $path = public_path() . "/" . $eptool->file_id;
             unlink($path);
         }
         $eptool->delete();
@@ -192,11 +192,6 @@ class EptoolController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 401);
         }
-        //        if($image = $request->file('image_id')) {
-        //            dd($image);
-        //            $request->image_id = $request->file->store('public/images');//it will be the path of photo as string
-        //
-        //        }
         $tool = Eptool::create($request->all());
         $tool->save();
         return response()->json(Eptool::with('epcategory')->get(), 201);

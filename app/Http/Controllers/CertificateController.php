@@ -67,7 +67,7 @@ class CertificateController extends Controller
             $file = $request->file('file_id');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Certificates'), $filename);
-            $certificate->file_id = $filename;
+            $certificate->file_id = 'Certificates/' . $filename;
         }
 
         $certificate->name = $request->name;
@@ -82,27 +82,6 @@ class CertificateController extends Controller
         );
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -131,13 +110,13 @@ class CertificateController extends Controller
 
         if ($request->file('file_id')) {
             if (isset($certificate['file_id'])) {
-                $path = public_path() . "/Certificates/" . $certificate->file_id;
+                $path = public_path() . "/" . $certificate->file_id;
                 unlink($path);
             }
             $file = $request->file('file_id');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Certificates'), $filename);
-            $certificate->file_id = $filename;
+            $certificate->file_id = 'Certificates/' .  $filename;
         }
         $certificate->name = is_null($request->name) ? $certificate->name : $request->name;
         $certificate->save();
@@ -161,7 +140,7 @@ class CertificateController extends Controller
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         if (isset($certificate['file_id'])) {
-            $path = public_path() . "/Certificates/" . $certificate->file_id;
+            $path = public_path() . "/" . $certificate->file_id;
             unlink($path);
         }
         $certificate->delete();

@@ -81,13 +81,13 @@ class AdminController extends Controller
         if ($request->file('imagePath')) {
 
             if ($user->imagePath) {
-                $path = public_path() . "/Photos/" . $user->imagePath;
+                $path = public_path() . "/" . $user->imagePath;
                 unlink($path);
             }
             $file = $request->file('imagePath');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Photos'), $filename);
-            $user->imagePath = $filename;
+            $user->imagePath = 'Photos/' . $filename;
         }
         $user->update($request->except('imagePath'));
         return response()->json([
