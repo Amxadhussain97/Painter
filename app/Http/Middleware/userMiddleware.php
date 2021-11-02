@@ -22,7 +22,7 @@ class userMiddleware
         $user = User::where('id', $userId)->first();
 
         if ($request->user_id) {
-            if ($user->role != 'admin') {
+            if ($user->role != 'Admin') {
                 $request->user_id = $userId;
             }
         }

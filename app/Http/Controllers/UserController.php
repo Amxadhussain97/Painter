@@ -75,6 +75,7 @@ class UserController extends Controller
     //User Profile Api -GET
     public function profile()
     {
+
         $user_data = auth()->user();
 
         return response()->json([
@@ -134,7 +135,7 @@ class UserController extends Controller
             $file->move(public_path('Photos'), $filename);
             $user->imagePath = "Photos/".$filename;
         }
-        $user->update($request->except('imagePath'));
+        $user->update($request->except(['imagePath','id']));
         return response()->json([
             "message" => "Updated Successfully"
         ], 204);

@@ -15,19 +15,34 @@ class AdminController extends Controller
 {
     //Users
 
+    public function getUser($request)
+    {
+
+        $user = User::find($request->user_id);
+        if ($user->isEmpty()) {
+            return response()->json(["message" => "No users available"], 404);
+        }
+        return response()->json(
+            [
+                "user" => $user
+            ],
+            200
+        );
+    }
+
     public function getUsers()
     {
 
         $userId = auth()->user()->id;
-        $user = User::where('id', $userId)->first();
-        if ($user->role != 'admin') {
-            return  response()->json(
-                [
-                    "message" => 'No Permission',
-                ],
-                404
-            );
-        }
+        // $user = User::where('id', $userId)->first();
+        // if ($user->role != 'Admin') {
+        //     return  response()->json(
+        //         [
+        //             "message" => 'No Permission',
+        //         ],
+        //         404
+        //     );
+        // }
         $users = User::all();
         if ($users->isEmpty()) {
             return response()->json(["message" => "No users available"], 404);
@@ -36,7 +51,7 @@ class AdminController extends Controller
         return response()->json(
             [
                 "message" => 'success',
-                "users " => $users
+                "users" => $users
             ],
             200
         );
@@ -46,7 +61,7 @@ class AdminController extends Controller
     {
         $checkId = auth()->user()->id;
         $user = User::where('id', $checkId)->first();
-        if ($user->role != 'admin') {
+        if ($user->role != 'Admin') {
             return  response()->json(
                 [
                     "message" => 'No Permission',
@@ -61,17 +76,17 @@ class AdminController extends Controller
 
 
         $rules = [
-            'name' => 'max:255|min:3',
+            // 'name' => 'max:255|min:3',
             'email' => 'email',
-            'gender' => 'max:6|min:4',
-            'imagePath' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'birthDate' => 'date',
-            'area' => 'max:20|min:3',
-            'bankName' => 'max:20|min:2',
-            'rocket' => 'max:20|min:2',
-            'bkash' => 'max:20|min:2',
-            'nogod' => 'max:20|min:2',
-            'role' => 'max:10|min:4',
+            // 'gender' => 'max:6|min:4',
+            // 'imagePath' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'birthDate' => 'date',
+            // 'area' => 'max:20|min:3',
+            // 'bankName' => 'max:20|min:2',
+            // 'rocket' => 'max:20|min:2',
+            // 'bkash' => 'max:20|min:2',
+            // 'nogod' => 'max:20|min:2',
+            // 'role' => 'max:10|min:4',
 
         ];
         $validator = Validator::make($request->all(), $rules);
