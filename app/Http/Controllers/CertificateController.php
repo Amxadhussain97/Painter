@@ -16,7 +16,7 @@ class CertificateController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getCertificates($request)
+    public function getCertificates(Request $request)
     {
         $userId = $request->user_id;
 

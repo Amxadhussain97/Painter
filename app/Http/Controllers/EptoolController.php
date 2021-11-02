@@ -140,8 +140,9 @@ class EptoolController extends Controller
         ], 204);
     }
 
-    public function getEptools($request)
+    public function getEptools(Request $request)
     {
+
         $userId = $request->user_id;
 
 

@@ -16,7 +16,7 @@ class InsuranceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getInsurances($request)
+    public function getInsurances(Request $request)
     {
         $userId = $request->user_id;
         $insurances = Insurance::select('name')->where('user_id', $userId)->get();

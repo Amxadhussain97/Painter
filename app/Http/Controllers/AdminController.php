@@ -15,11 +15,10 @@ class AdminController extends Controller
 {
     //Users
 
-    public function getUser($request)
+    public function getUser($user_id)
     {
-
-        $user = User::find($request->user_id);
-        if ($user->isEmpty()) {
+        $user = User::find($user_id);
+        if (is_null($user)) {
             return response()->json(["message" => "No users available"], 404);
         }
         return response()->json(

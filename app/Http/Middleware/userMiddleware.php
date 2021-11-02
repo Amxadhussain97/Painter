@@ -28,6 +28,8 @@ class userMiddleware
         }
         else $request->user_id = $userId;
 
+       
+
         return $next($request);
     }
 }
