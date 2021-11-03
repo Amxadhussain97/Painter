@@ -21,7 +21,7 @@ class CertificateController extends Controller
         $userId = $request->user_id;
 
 
-        $certificates = Certificate::select('name')->where('user_id', $userId)->get();
+        $certificates = Certificate::where('user_id', $userId)->get();
         if ($certificates->isEmpty()) {
             return response()->json(["message" => "This User Doesn't have any Certificates"], 404);
         }

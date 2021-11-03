@@ -154,7 +154,7 @@ class EptoolController extends Controller
         return response()->json(
             [
                 "message" => 'success',
-                "eptools " => $eptools
+                "eptools" => $eptools
             ],
             200
         );

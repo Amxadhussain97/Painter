@@ -99,7 +99,7 @@ class UserController extends Controller
 
     public function updateProfile(Request $request)
     {
-// return public_path();
+        // return public_path();
         $user = User::find(auth()->user()->id);
         if (is_null($user)) {
             return response()->json(["message" => "Record Not Found!"], 404);
@@ -109,15 +109,15 @@ class UserController extends Controller
         $rules = [
             'name' => 'max:255|min:3',
             'email' => 'email',
-            'gender' => 'max:6|min:4',
-            'imagePath' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'birthDate' => 'date',
-            'area' => 'max:20|min:3',
-            'bankName' => 'max:20|min:2',
-            'rocket' => 'max:20|min:2',
-            'bkash' => 'max:20|min:2',
-            'nogod' => 'max:20|min:2',
-            'role' => 'max:10|min:4',
+            'gender' => 'max:6',
+            // 'imagePath' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'birthDate' => 'date',
+            'area' => 'max:20|',
+            'bankName' => 'max:20|',
+            'rocket' => 'max:20|',
+            'bkash' => 'max:20|',
+            'nogod' => 'max:20|',
+            'role' => 'max:10|',
 
         ];
         $validator = Validator::make($request->all(), $rules);
@@ -133,9 +133,9 @@ class UserController extends Controller
             $file = $request->file('imagePath');
             $filename = time() . '.' . $file->extension();
             $file->move(public_path('Photos'), $filename);
-            $user->imagePath = "Photos/".$filename;
+            $user->imagePath = "Photos/" . $filename;
         }
-        $user->update($request->except(['imagePath','id']));
+        $user->update($request->except(['imagePath', 'id']));
         return response()->json([
             "message" => "Updated Successfully"
         ], 204);
