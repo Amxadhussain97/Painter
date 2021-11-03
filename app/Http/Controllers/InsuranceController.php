@@ -19,7 +19,7 @@ class InsuranceController extends Controller
     public function getInsurances(Request $request)
     {
         $userId = $request->user_id;
-        $insurances = Insurance::select('name')->where('user_id', $userId)->get();
+        $insurances = Insurance::where('user_id', $userId)->get();
         if ($insurances->isEmpty()) {
             return response()->json(["message" => "This User Doesn't have any Insurances"], 404);
         }
@@ -64,7 +64,7 @@ class InsuranceController extends Controller
         $insurance->save();
         return response()->json([
             "message" => "Success",
-            "Insurance" => $insurance->makeHidden(['user_id'])
+            "Insurance" => $insurance
         ], 201);
     }
 
