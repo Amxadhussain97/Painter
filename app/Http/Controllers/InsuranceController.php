@@ -87,8 +87,8 @@ class InsuranceController extends Controller
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         $rules = [
-            'name' => 'max:255|min:3',
-            'file_id' => 'mimes:doc,docx,pdf,txt|max:2048',
+            'name' => 'max:255|',
+            // 'file_id' => 'mimes:doc,docx,pdf,txt|max:2048',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -112,7 +112,7 @@ class InsuranceController extends Controller
         return response()->json(
             [
                 "message" => "Updated Successfully",
-                "insurance" => $insurance->name,
+                "insurance" => $insurance,
             ],
             204
         );
