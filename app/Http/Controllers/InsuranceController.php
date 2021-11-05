@@ -26,7 +26,7 @@ class InsuranceController extends Controller
 
         return response()->json([
             "message" => "Success",
-            "insurance" => $insurances
+            "list" => $insurances
         ], 200);
     }
 
@@ -124,7 +124,7 @@ class InsuranceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function deleteInsurance($request, $insuranceId)
+    public function deleteInsurance(Request $request, $insuranceId)
     {
         $userId = $request->user_id;
 

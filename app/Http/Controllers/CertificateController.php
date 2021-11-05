@@ -76,7 +76,7 @@ class CertificateController extends Controller
         return response()->json(
             [
                 "message" => "Success",
-                "certificate" => $certificate->makeHidden(['user_id'])
+                "list" => $certificate->makeHidden(['user_id'])
             ],
             201
         );
@@ -132,7 +132,7 @@ class CertificateController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function deleteCertificate($request, $certificateId)
+    public function deleteCertificate(Request $request, $certificateId)
     {
         $userId = $request->user_id;
         $certificate = Certificate::find($certificateId);
