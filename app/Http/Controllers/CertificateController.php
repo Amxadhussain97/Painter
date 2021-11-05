@@ -29,7 +29,7 @@ class CertificateController extends Controller
         return response()->json(
             [
                 "message" => 'success',
-                "certificates" => $certificates
+                "list" => $certificates
             ],
             200
         );
@@ -76,7 +76,7 @@ class CertificateController extends Controller
         return response()->json(
             [
                 "message" => "Success",
-                "list" => $certificate->makeHidden(['user_id'])
+                "certificate" => $certificate->makeHidden(['user_id'])
             ],
             201
         );
