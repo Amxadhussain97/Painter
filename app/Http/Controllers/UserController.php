@@ -33,7 +33,7 @@ class UserController extends Controller
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 401);
+            return response()->json(["message" => $validator->errors()], 401);
         }
         $user = new User();
         $user->email = $request->email;
@@ -41,6 +41,7 @@ class UserController extends Controller
         $user->save();
         $token = auth()->attempt(["email" => $request->email, "password"  => $request->password]);
         return response()->json([
+            "message" => "success",
             "token" => $token
         ], 201);
     }
@@ -67,8 +68,8 @@ class UserController extends Controller
 
         return response()->json([
 
-            "message" => "Login Successful",
-            "access_token" => $token
+            "message" => "success",
+            "token" => $token
         ], 201);
     }
 
