@@ -227,7 +227,7 @@ class GalleryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function deleteGallery($request, $galleryId)
+    public function deleteGallery(Request $request, $galleryId)
     {
         $userId = $request->user_id;
         $gallery = Gallery::find($galleryId);
