@@ -26,9 +26,10 @@ class userMiddleware
                 $request->user_id = $userId;
             }
         }
+
         else $request->user_id = $userId;
 
-       
+
 
         return $next($request);
     }

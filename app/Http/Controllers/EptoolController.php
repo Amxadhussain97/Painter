@@ -19,7 +19,6 @@ class EptoolController extends Controller
         $tool_query = Eptool::with('epcategory');
 
         if ($request->category) {
-            //$tool_query->where('epcategory_id',$request->category);
             $tool_query->whereHas('epcategory', function ($query) use ($request) {
                 $query->where('name', $request->category);
             });
@@ -28,7 +27,6 @@ class EptoolController extends Controller
             $tool_query->where('name', $request->name);
         }
         $tools = $tool_query->get();
-        // dd($tools);
         return response()->json(
             $tools,
             200
@@ -54,6 +52,7 @@ class EptoolController extends Controller
 
     public function postEptool(Request $request)
     {
+        // dd($request->image_id);
         $userId = $request->user_id;
 
         $r = [
@@ -71,18 +70,28 @@ class EptoolController extends Controller
                 'name' => 'required|max:255|min:3',
                 'amount' => 'max:255|min:3',
                 'model' => 'max:255|min:3',
-                'image_id' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'user_id' => 'required|exists:users,id',
             ]
         );
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 401);
+            return response()->json(['error' => $validator->errors(),
+
+        ], 401);
         }
         $eptool = new Eptool();
-        if ($request->file('image_id')) {
-            $file = $request->file('image_id');
-            $filename = time() . '.' . $file->extension();
-            $file->move(public_path('Eptools'), $filename);
+        if ($request->image_id) {
+            $img=$request->image_id;
+            $slug='png';
+            if(str_contains($img,'jpeg')) $slug = 'jpeg';
+            else if(str_contains($img,'png')) $slug = 'png';
+            else if(str_contains($img,'jpg')) $slug = 'jpg';
+            $img = str_replace('data:image/jpeg;base64','',$img);
+            $img = str_replace('data:image/jpg;base64','',$img);
+            $img = str_replace('data:image/png;base64','',$img);
+            $img =str_replace(' ', '+', $img);
+            $file = base64_decode($img);
+            $filename =time() . '.'.$slug;
+            file_put_contents(public_path('Eptools/'). $filename,$file);
             $eptool->image_id = 'Eptools/' . $filename;
         }
 
