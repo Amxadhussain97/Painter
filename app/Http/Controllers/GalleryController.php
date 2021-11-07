@@ -30,7 +30,7 @@ class GalleryController extends Controller
     public function getGalleries(Request $request)
     {
         $userId = $request->user_id;
-        $galleries  =  Gallery::where('user_id', $userId)->get('name');
+        $galleries  =  Gallery::where('user_id', $userId)->get();
         if ($galleries->isEmpty()) {
             return response()->json(["message" => "No content found"], 404);
         }

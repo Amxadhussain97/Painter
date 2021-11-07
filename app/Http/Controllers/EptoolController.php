@@ -121,14 +121,13 @@ class EptoolController extends Controller
     {
         $userId = $request->user_id;
         $eptool = Eptool::find($eptoolId);
-        if (is_null($eptool) || $eptool->user_id != $userId) {
+        if (is_null($eptool)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         $rules = [
             'name' => 'max:255|min:3',
             'amount' => 'max:255|min:3',
             'model' => 'max:255|min:3',
-            'image_id' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -153,7 +152,7 @@ class EptoolController extends Controller
         $eptool->save();
         return response()->json([
             "message" => 'Updated Successfully',
-        ], 204);
+        ], 201);
     }
 
     public function getEptools(Request $request)
@@ -162,7 +161,7 @@ class EptoolController extends Controller
         $userId = $request->user_id;
 
 
-        $eptools = Eptool::select(['name', 'image_id', 'amount', 'model'])->where('user_id', $userId)->get();
+        $eptools = Eptool::select(['id', 'name', 'image_id', 'amount', 'model'])->where('user_id', $userId)->get();
         if ($eptools->isEmpty()) {
             return response()->json(["message" => "This User Doesn't have any Eptools"], 404);
         }
