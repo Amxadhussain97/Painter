@@ -176,16 +176,15 @@ class EptoolController extends Controller
     }
 
 
-    public function deleteEptool($request, $eptoolId)
+    public function deleteEptool(Request $request, $eptoolId)
     {
-        $userId = $request->user_id;
         $eptool = Eptool::find($eptoolId);
 
-        if (is_null($eptool) || $eptool->user_id != $userId) {
+        if (is_null($eptool)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
-        if (isset($eptoole['image_id'])) {
-            $path = public_path() . "/" . $eptool->file_id;
+        if (isset($eptool['image_id'])) {
+            $path = public_path() . "/" . $eptool->image_id;
             unlink($path);
         }
         $eptool->delete();
