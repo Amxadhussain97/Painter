@@ -92,9 +92,8 @@ class CertificateController extends Controller
      */
     public function updateCertificate(Request $request, $certificateId)
     {
-        $userId = $request->user_id;
         $certificate = Certificate::find($certificateId);
-        if (is_null($certificate) || $certificate->user_id != $userId) {
+        if (is_null($certificate)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         $rules = [
@@ -134,10 +133,9 @@ class CertificateController extends Controller
      */
     public function deleteCertificate(Request $request, $certificateId)
     {
-        $userId = $request->user_id;
         $certificate = Certificate::find($certificateId);
 
-        if (is_null($certificate) || $certificate->user_id != $userId) {
+        if (is_null($certificate)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         if (isset($certificate['file_id'])) {

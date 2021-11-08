@@ -51,8 +51,8 @@ class GalleryController extends Controller
         $validator = Validator::make(
             $r,
             [
-                'image_id' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'gallery_id' => 'required|exists:galleries,id',
+                'image_id' => 'image|mimes:jpeg,png,jpg,gif,svg',
+                // 'gallery_id' => 'required|exists:galleries,id',
 
             ]
         );
