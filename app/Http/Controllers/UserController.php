@@ -27,13 +27,14 @@ class UserController extends Controller
 
         $rules = [
             'email' => 'required|email|unique:users',
-            'password' => 'required',
+            'password' => 'required|min:6',
 
 
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return response()->json(["message" => $validator->errors()], 401);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
         }
         $user = new User();
         $user->email = $request->email;
