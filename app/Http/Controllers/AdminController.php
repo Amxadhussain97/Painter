@@ -58,16 +58,7 @@ class AdminController extends Controller
 
     public function updateUser(Request $request, $userId)
     {
-        $checkId = auth()->user()->id;
-        $user = User::where('id', $checkId)->first();
-        if ($user->role != 'Admin') {
-            return  response()->json(
-                [
-                    "message" => 'No Permission',
-                ],
-                404
-            );
-        }
+        $user = User::where('id', $userId)->first();
         $user = User::find($userId);
         if (is_null($user)) {
             return response()->json(["message" => "Record Not Found!"], 404);

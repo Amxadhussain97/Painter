@@ -32,7 +32,7 @@ class GalleryController extends Controller
         $userId = $request->user_id;
         $galleries  =  Gallery::where('user_id', $userId)->get();
         if ($galleries->isEmpty()) {
-            return response()->json(["message" => "No content found"], 404);
+            return response()->json(["message" => "No gallery found"], 404);
         }
         return response()->json([
             "message" => "Success",
@@ -166,14 +166,14 @@ class GalleryController extends Controller
 
     public function updateGallery(Request $request, $galleryId)
     {
-        $userId = $request->user_id;
+
         $gallery = Gallery::find($galleryId);
 
-        if (is_null($gallery) || $gallery->user_id != $userId) {
+        if (is_null($gallery)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         $rules = [
-            'name' => 'required|max:255|min:3'
+            'name' => 'required|max:255'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -229,10 +229,9 @@ class GalleryController extends Controller
      */
     public function deleteGallery(Request $request, $galleryId)
     {
-        $userId = $request->user_id;
         $gallery = Gallery::find($galleryId);
 
-        if (is_null($gallery) || $gallery->user_id != $userId) {
+        if (is_null($gallery) ) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
 
