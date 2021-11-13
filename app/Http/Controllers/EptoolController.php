@@ -74,10 +74,8 @@ class EptoolController extends Controller
             ]
         );
         if ($validator->fails()) {
-            return response()->json([
-                'error' => $validator->errors(),
-
-            ], 401);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
         }
         $eptool = new Eptool();
         if ($request->file('image_id')) {
@@ -132,7 +130,8 @@ class EptoolController extends Controller
 
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
         }
 
 

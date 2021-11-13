@@ -57,7 +57,8 @@ class GalleryController extends Controller
             ]
         );
         if ($validator->fails() || is_null($gallery)) {
-            return response()->json(['error' => $validator->errors()], 401);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
         }
 
         $photo = new Photo();
@@ -91,7 +92,8 @@ class GalleryController extends Controller
             ]
         );
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 401);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
         }
         $gallery = new Gallery();
         $gallery->name = $request->name;
@@ -178,7 +180,8 @@ class GalleryController extends Controller
 
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
         }
         $gallery->name = $request->name;
         $gallery->save();
@@ -204,7 +207,8 @@ class GalleryController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
         }
         if (isset($photo['image_id'])) {
             $path = public_path() . "/" . $photo->image_id;

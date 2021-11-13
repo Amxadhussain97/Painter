@@ -81,7 +81,8 @@ class AdminController extends Controller
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 401);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
         }
         if ($request->file('imagePath')) {
 
