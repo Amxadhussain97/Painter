@@ -288,7 +288,7 @@ class EptoolController extends Controller
         $validator = Validator::make(
             $r,
             [
-                'image_id' => 'image|mimes:jpeg,png,jpg,gif,svg',
+                'image_id.*' => 'mimes:jpeg,jpg,png,gif,csv,txt,pdf|max:2048',
                 'eptool_id' => 'required|exists:eptools,id',
 
             ]
@@ -298,18 +298,21 @@ class EptoolController extends Controller
             return response()->json(["message" => $error], 401);
         }
 
-        $epphoto = new Epphoto();
-        if ($request->file('image_id')) {
-            $file = $request->file('image_id');
-            $filename = time() . '.' . $file->extension();
+
+        foreach ($request->file('image_id') as $file) {
+            $epphoto = new Epphoto();
+            $filename = $file->getClientOriginalName();
             $file->move(public_path('EpPhotos'), $filename);
             $epphoto->image_id = 'EpPhotos/' . $filename;
+            $epphoto->eptool_id = $eptoolId;
+            $epphoto->save();
         }
-        $epphoto->eptool_id = $eptoolId;
-        $epphoto->save();
+
+        $list = Epphoto::where('eptool_id', $eptoolId)->get();
+
         return response()->json([
             "message" => "Success",
-            "photo" => $epphoto,
+            "list" => $list,
 
         ], 201);
     }
@@ -354,7 +357,7 @@ class EptoolController extends Controller
             unlink($path);
         }
         $file = $request->file('image_id');
-        $filename = time() . '.' . $file->extension();
+        $filename = $file->getClientOriginalName();
         $file->move(public_path('EpPhotos'), $filename);
         $photo->image_id = 'EpPhotos/' . $filename;
         $photo->save();

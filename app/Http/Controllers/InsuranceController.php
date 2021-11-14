@@ -55,7 +55,7 @@ class InsuranceController extends Controller
         $insurance = new Insurance();
         if ($request->file('file_id')) {
             $file = $request->file('file_id');
-            $filename = time() . '.' . $file->extension();
+            $filename = $file->getClientOriginalName();
             $file->move(public_path('Insurances'), $filename);
             $insurance->file_id = 'Insurances/' . $filename;
         }
@@ -69,7 +69,7 @@ class InsuranceController extends Controller
         ], 201);
     }
 
-  
+
 
     public function updateInsurance(Request $request, $insuranceId)
     {
@@ -96,7 +96,7 @@ class InsuranceController extends Controller
                 unlink($path);
             }
             $file = $request->file('file_id');
-            $filename = time() . '.' . $file->extension();
+            $filename = $file->getClientOriginalName();
             $file->move(public_path('Insurances'), $filename);
             $insurance->file_id = 'Insurances/' . $filename;
         }
