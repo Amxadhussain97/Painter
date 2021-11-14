@@ -243,8 +243,8 @@ class GalleryController extends Controller
         $photo_query = Photo::where('gallery_id', $galleryId);
         $photos = $photo_query->get();
         foreach ($photos as $photo) {
-            if (isset($photo['name'])) {
-                $path = public_path() . "/Photos/" . $photo->name;
+            if (isset($photo['image_id'])) {
+                $path = public_path() . "/" . $photo->image_id;
                 unlink($path);
             }
         }

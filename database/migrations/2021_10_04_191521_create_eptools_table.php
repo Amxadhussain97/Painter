@@ -16,9 +16,8 @@ class CreateEptoolsTable extends Migration
         Schema::create('eptools', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('image_id');
-            $table->string('model');
-            $table->string('amount');
+            $table->string('model')->nullable();;
+            $table->string('description')->nullable();;
             $table->foreignId('user_id')->onDelete('cascade');
             $table->timestamps();
         });

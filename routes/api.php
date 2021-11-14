@@ -54,6 +54,13 @@ Route::group(["middleware" => ["auth:api"]], function () {
         Route::post('eptools/{Eptool::id}', [EptoolController::class, 'updateEptool']); // TO UPDATE AN USER'S EPTOOL
         Route::delete('eptools/{Eptool::id}', [EptoolController::class, 'deleteEptool']); // TO DELETE AN USER'S EPTOOL
 
+        Route::post('eptools/{Eptool::id}/photos', [EptoolController::class, 'postEpphoto']); // TO POST AN EPTOOL
+        Route::get('eptools/{Eptool::id}/photos', [EptoolController::class, 'getEpphotos']); // TO GET EPTOOL OF AN USER
+        Route::post('eptools/{Eptool::id}/photos/{Epphoto::id}', [EptoolController::class, 'updateEpphoto']); // TO UPDATE AN USER'S EPTOOL
+        Route::delete('eptools/{Eptool::id}/photos/{Epphoto::id}', [EptoolController::class, 'deleteEpphoto']); // TO DELETE AN USER'S EPTOOL
+
+
+
         Route::post('certificates', [CertificateController::class, 'postCertificate']); // TO POST A CERTIFICATE
         Route::get('certificates', [CertificateController::class, 'getCertificates']); // TO GET CERTIFICATES OF AN USER
         Route::post('certificates/{Certificate::id}', [CertificateController::class, 'updateCertificate']); // TO UPDATE AN USER'S CERTIFICATE

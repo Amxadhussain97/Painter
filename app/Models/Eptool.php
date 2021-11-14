@@ -13,4 +13,8 @@ class Eptool extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function epphotos()
+    {
+        return $this->hasMany(Epphoto::class);
+    }
 }
