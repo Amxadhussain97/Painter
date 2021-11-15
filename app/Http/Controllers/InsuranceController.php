@@ -44,7 +44,7 @@ class InsuranceController extends Controller
             $r,
             [
                 'name' => 'required|max:255|min:3',
-                'file_id' => 'required|mimes:doc,docx,pdf,txt|max:2048',
+                'file_id' => 'required|mimes:doc,docx,pdf,txt',
             ]
         );
         if ($validator->fails()) {

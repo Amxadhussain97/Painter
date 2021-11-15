@@ -201,7 +201,7 @@ class GalleryController extends Controller
         }
 
         $rules = [
-            'image_id' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image_id' => 'image|mimes:jpeg,png,jpg,gif,svg',
         ];
 
         $validator = Validator::make($request->all(), $rules);

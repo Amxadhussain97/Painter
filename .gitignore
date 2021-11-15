@@ -4,8 +4,9 @@
 /public/Eptools
 /public/Certificates
 /public/Gallery
-/public/insurances
+/public/Insurances
 /public/Photos
+/public/EpPhotos
 /storage/*.key
 /vendor
 .env

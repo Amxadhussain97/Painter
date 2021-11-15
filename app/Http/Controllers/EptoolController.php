@@ -281,6 +281,7 @@ class EptoolController extends Controller
     public function postEpphoto(Request $request, $eptoolId)
     {
 
+
         $r = [
             'image_id' => $request->image_id,
             'eptool_id' => $eptoolId,
@@ -288,7 +289,7 @@ class EptoolController extends Controller
         $validator = Validator::make(
             $r,
             [
-                'image_id.*' => 'mimes:jpeg,jpg,png,gif,csv,txt,pdf|max:2048',
+                'image_id.*' => 'mimes:jpeg,jpg,png,gif,csv,txt,pdf',
                 'eptool_id' => 'required|exists:eptools,id',
 
             ]
