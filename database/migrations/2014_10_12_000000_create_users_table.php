@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->string('bankName')->nullable();
             $table->string('rocket')->nullable();
             $table->string('bkash')->nullable();
+            $table->string('phonenumber')->nullable();
             $table->string('nogod')->nullable();
             $table->string('role')->nullable();
             $table->rememberToken();

@@ -50,7 +50,7 @@ class UserController extends Controller
     //User Login Api -POST
     public function login(Request $request)
     {
-        
+
 
         $request->validate([
             "email" => "required|email",
@@ -133,7 +133,7 @@ class UserController extends Controller
                 unlink($path);
             }
             $file = $request->file('imagePath');
-            $filename = time() . '.' . $file->extension();
+            $filename = $file->getClientOriginalName();
             $file->move(public_path('Photos'), $filename);
             $user->imagePath = "Photos/" . $filename;
         }
