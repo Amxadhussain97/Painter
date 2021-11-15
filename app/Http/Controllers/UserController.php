@@ -50,7 +50,7 @@ class UserController extends Controller
     //User Login Api -POST
     public function login(Request $request)
     {
-        //validation
+        
 
         $request->validate([
             "email" => "required|email",
