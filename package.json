@@ -16,6 +16,7 @@
         "postcss": "^8.1.14"
     },
     "dependencies": {
-        "firebase": "^9.1.1"
+        "firebase": "^9.1.1",
+        "react-pdf": "^5.5.0"
     }
 }

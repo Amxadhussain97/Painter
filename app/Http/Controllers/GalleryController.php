@@ -64,7 +64,7 @@ class GalleryController extends Controller
         $photo = new Photo();
         if ($request->file('image_id')) {
             $file = $request->file('image_id');
-            $filename = $file->getClientOriginalName();
+            $filename = $file->getClientOriginalName() . time();
             $file->move(public_path('Photos'), $filename);
             $photo->image_id = 'Photos/' . $filename;
         }
@@ -215,7 +215,7 @@ class GalleryController extends Controller
             unlink($path);
         }
         $file = $request->file('image_id');
-        $filename = $file->getClientOriginalName();
+        $filename = $file->getClientOriginalName() . time();;
         $file->move(public_path('Photos'), $filename);
         $photo->image_id = 'Photos/' . $filename;
         $photo->save();
@@ -235,7 +235,7 @@ class GalleryController extends Controller
     {
         $gallery = Gallery::find($galleryId);
 
-        if (is_null($gallery) ) {
+        if (is_null($gallery)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
 
