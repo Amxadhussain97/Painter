@@ -302,7 +302,7 @@ class EptoolController extends Controller
 
         foreach ($request->file('image_id') as $file) {
             $epphoto = new Epphoto();
-            $filename = $file->getClientOriginalName() . time();
+            $filename =  time() . $file->getClientOriginalName();
             $file->move(public_path('EpPhotos'), $filename);
             $epphoto->image_id = 'EpPhotos/' . $filename;
             $epphoto->eptool_id = $eptoolId;
@@ -358,7 +358,7 @@ class EptoolController extends Controller
             unlink($path);
         }
         $file = $request->file('image_id');
-        $filename = $file->getClientOriginalName() . time();
+        $filename =  time() . $file->getClientOriginalName();
         $file->move(public_path('EpPhotos'), $filename);
         $photo->image_id = 'EpPhotos/' . $filename;
         $photo->save();

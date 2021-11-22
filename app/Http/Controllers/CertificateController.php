@@ -66,7 +66,7 @@ class CertificateController extends Controller
         $certificate = new Certificate();
         if ($request->file('file_id')) {
             $file = $request->file('file_id');
-            $filename = $file->getClientOriginalName() . time();
+            $filename =  time() . $file->getClientOriginalName();
             $file->move(public_path('Certificates'), $filename);
             $certificate->file_id = 'Certificates/' . $filename;
         }
@@ -115,7 +115,7 @@ class CertificateController extends Controller
                 unlink($path);
             }
             $file = $request->file('file_id');
-            $filename = $file->getClientOriginalName() . time();
+            $filename =  time() . $file->getClientOriginalName();
             $file->move(public_path('Certificates'), $filename);
             $certificate->file_id = 'Certificates/' .  $filename;
         }
