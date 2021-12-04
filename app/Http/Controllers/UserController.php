@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Lead;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -116,6 +117,7 @@ class UserController extends Controller
             'gender' => 'max:6',
             'imagePath' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             // 'birthDate' => 'date',
+            'phonenumber' => 'min:8',
             'area' => 'max:20|',
             'bankName' => 'max:20|',
             'rocket' => 'max:20|',
@@ -156,10 +158,8 @@ class UserController extends Controller
 
         $r = [
             'name' => $request->name,
-            'user_id' => $userId,
-            'location' => $request->location,
-            'phone' => $request->phone,
-            'email' => $request->email,
+            'area' => $userId,
+            'phonenumber' => $request->phonenumber,
         ];
 
 
@@ -167,7 +167,7 @@ class UserController extends Controller
             $r,
             [
                 'name' => 'required|max:255|min:3',
-                'user_id' => 'required|exists:users,id',
+                'area' => 'required|exists:users,id',
                 'phone' => 'required|max:255|min:6',
                 'email' => 'required|email',
                 'location' => 'required',
@@ -251,11 +251,10 @@ class UserController extends Controller
         $userId = $request->user_id;
 
         $r = [
-            'name' => $request->name,
+            'area' => $request->area,
             'user_id' => $userId,
-            'location' => $request->location,
-            'phone' => $request->phone,
-            'email' => $request->email,
+            'phonenumber' => $request->phonenumber,
+            'running_leads' => $request->running_leads,
         ];
 
 
@@ -264,7 +263,7 @@ class UserController extends Controller
             [
                 'name' => 'required|max:255|min:3',
                 'user_id' => 'required|exists:users,id',
-                'phone' => 'required|max:255|min:6',
+                'phonenumber' => 'required|max:255|min:8',
                 'email' => 'required|email',
                 'location' => 'required',
             ]
@@ -299,7 +298,7 @@ class UserController extends Controller
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         $rules = [
-            'name' => 'max:255|',
+            'area' => 'max:255|',
             'phone' => 'max:255|min:6',
             'email' => 'email',
         ];
@@ -349,35 +348,57 @@ class UserController extends Controller
         $userId = $request->user_id;
 
         $r = [
-            'name' => $request->name,
-            'file_id' => $request->file_id,
+            'area' => $request->area,
+            'running_leads' => $request->running_leads,
+            'phonenumber' => $request->phonenumber,
             'user_id' => $userId,
         ];
-
         $validator = Validator::make(
             $r,
             [
-                'name' => 'required|max:255|min:3',
-                'file_id' => 'required|mimes:doc,docx,pdf,txt|max:2048',
-                'user_id' => 'required|exists:users,id',
+                'area' => 'required|max:255|min:3',
+                'running_leads' => 'required',
+                'phonenumber' => 'required|min:8',
             ]
         );
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 401);
         }
-        $lead = new Certificate();
 
 
-        $lead->name = $request->name;
-        $lead->user_id = $userId;
+        $lead = new Lead();
+
+        $lead->area = $request->area;
+        $lead->phonenumber = $request->phonenumber;
+        $lead->running_leads = $request->running_leads;
+        $lead->user_id = $request->user_id;
         $lead->save();
+        return response()->json([
+            "message" => "Success",
+            "Lead" => $lead
+        ], 201);
+    }
+
+
+
+
+    public function getLeads(Request $request)
+    {
+        $userId = $request->user_id;
+
+
+        $lead = Lead::where('user_id', $userId)->get();
+        if ($lead->isEmpty()) {
+            return response()->json(["message" => "This User Doesn't have any Leads"], 404);
+        }
+
         return response()->json(
             [
-                "message" => "Success",
-                "lead" => $lead->makeHidden(['user_id'])
+                "message" => 'success',
+                "list" => $lead
             ],
-            201
+            200
         );
     }
 
@@ -385,13 +406,13 @@ class UserController extends Controller
 
     public function updateLead(Request $request, $leadId)
     {
-        $lead = User::find($leadId);
+        $lead = Lead::find($leadId);
         if (is_null($lead)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         $rules = [
-            'name' => 'max:255|',
-            // 'file_id' => 'mimes:doc,docx,pdf,txt|max:2048',
+            'running_leads' => 'max:255|min:3required',
+            'phonenumber' => 'min:8',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -402,17 +423,21 @@ class UserController extends Controller
 
 
 
-        $lead->name = is_null($request->name) ? $certificate->name : $request->name;
-        $certificate->save();
+        $lead->area = is_null($request->area) ? $lead->area : $request->area;
+        $lead->running_leads = is_null($request->running_leads) ? $lead->running_leads : $request->running_leads;
+        $lead->phonenumber = is_null($request->phonenumber) ? $lead->phonenumber : $request->phonenumber;
+
+        $lead->save();
+
         return response()->json([
             "message" => 'Updated Successfully',
-            "lead" => $lead,
+            "Lead" => $lead,
         ], 204);
     }
 
     public function deleteLead(Request $request, $leadId)
     {
-        $lead = Certificate::find($leadId);
+        $lead = Lead::find($leadId);
 
         if (is_null($lead)) {
             return response()->json(["message" => "Record Not Found!"], 404);
