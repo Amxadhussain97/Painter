@@ -40,10 +40,12 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
         $user->save();
+
         $token = auth()->attempt(["email" => $request->email, "password"  => $request->password]);
         return response()->json([
             "message" => "success",
-            "token" => $token
+            "token" => $token,
+            "id" => $user->id,
         ], 201);
     }
 
