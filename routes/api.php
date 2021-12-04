@@ -39,15 +39,10 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::post("profile", [UserController::class, 'updateProfile']);
 
 
-
-
-
-
     Route::group(['middleware' => 'userMiddleware'], function () {
         Route::get("users", [AdminController::class, 'getUsers']); // TO GET ALL USERS
         Route::post('users/{User::id}', [AdminController::class, 'updateUser']); // TO UPDATE AN USER
         Route::get('users/{User::id}', [AdminController::class, 'getUser']); // TO UPDATE AN USER
-
 
         Route::post('eptools', [EptoolController::class, 'postEptool']); // TO POST AN EPTOOL
         Route::get('eptools', [EptoolController::class, 'getEptools']); // TO GET EPTOOL OF AN USER
@@ -58,8 +53,6 @@ Route::group(["middleware" => ["auth:api"]], function () {
         Route::get('eptools/{Eptool::id}/photos', [EptoolController::class, 'getEpphotos']); // TO GET EPTOOL OF AN USER
         Route::post('eptools/{Eptool::id}/photos/{Epphoto::id}', [EptoolController::class, 'updateEpphoto']); // TO UPDATE AN USER'S EPTOOL
         Route::delete('eptools/{Eptool::id}/photos/{Epphoto::id}', [EptoolController::class, 'deleteEpphoto']); // TO DELETE AN USER'S EPTOOL
-
-
 
         Route::post('certificates', [CertificateController::class, 'postCertificate']); // TO POST A CERTIFICATE
         Route::get('certificates', [CertificateController::class, 'getCertificates']); // TO GET CERTIFICATES OF AN USER
@@ -76,11 +69,25 @@ Route::group(["middleware" => ["auth:api"]], function () {
         Route::post('galleries/{Gallery::id}', [GalleryController::class, 'updateGallery']); // TO UPDATE AN USER'S GALLERY
         Route::delete('galleries/{Gallery::id}', [GalleryController::class, 'deleteGallery']); // TO DELETE AN USER'S GALLERY
 
-
         Route::post('galleries/{Gallery::id}/photos', [GalleryController::class, 'postUserPhoto']); // TO POST A PHOTO
         Route::get('galleries/{Gallery::id}/photos', [GalleryController::class, 'getUserPhotos']); // TO GET PHOTOS OF A GALLERY
         Route::post('galleries/{Gallery::id}/photos/{Photo::id}', [GalleryController::class, 'updateUserPhoto']); // TO UPDATE A GALLERY PHOTO
         Route::delete('galleries/{Gallery::id}/photos/{Photo::id}', [GalleryController::class, 'deleteUserPhoto']); // TO DELETE A GALLERY PHOTO
+
+        Route::post('subpainters', [UserController::class, 'postSubpainter']); // TO POST A GALLERY
+        Route::get('subpainters', [UserController::class, 'getSubpainters']); // TO GET GALLERIES OF AN USER
+        Route::post('subpainters/{Subpainter::id}', [UserController::class, 'updateSubpainter']); // TO UPDATE AN USER'S GALLERY
+        Route::delete('subpainters/{Subpainter::id}', [UserController::class, 'deleteSubpainter']); // TO DELETE AN USER'S GALLERY
+
+        Route::post('dealers', [UserController::class, 'postDealer']); // TO POST A GALLERY
+        Route::get('dealers', [UserController::class, 'getDealers']); // TO GET GALLERIES OF AN USER
+        Route::post('dealers/{Dealer::id}', [UserController::class, 'updateDealer']); // TO UPDATE AN USER'S GALLERY
+        Route::delete('dealers/{Dealer::id}', [UserController::class, 'deleteDealer']); // TO DELETE AN USER'S GALLERY
+
+        Route::post('leads', [UserController::class, 'postLead']); // TO POST A GALLERY
+        Route::get('leads', [UserController::class, 'getLeads']); // TO GET GALLERIES OF AN USER
+        Route::post('leads/{Lead::id}', [UserController::class, 'updateLead']); // TO UPDATE AN USER'S GALLERY
+        Route::delete('leads/{Lead::id}', [UserController::class, 'deleteLead']); // TO DELETE AN USER'S GALLERY
 
 
 
