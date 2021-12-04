@@ -383,7 +383,7 @@ class UserController extends Controller
 
     public function updateLead(Request $request, $leadId)
     {
-        $lead = Certificate::find($lead Id);
+        $lead = User::find($leadId);
         if (is_null($lead)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
@@ -410,7 +410,7 @@ class UserController extends Controller
 
     public function deleteLead(Request $request, $leadId)
     {
-        $lead= Certificate::find($leadId);
+        $lead = Certificate::find($leadId);
 
         if (is_null($lead)) {
             return response()->json(["message" => "Record Not Found!"], 404);
