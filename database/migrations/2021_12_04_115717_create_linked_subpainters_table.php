@@ -14,9 +14,8 @@ class CreateLinkedSubpaintersTable extends Migration
     public function up()
     {
         Schema::create('linked_subpainters', function (Blueprint $table) {
-            $table->id();
-            $table->string('first');
-            $table->string('second');
+            $table->string('painter');
+            $table->string('subpainter');
             $table->timestamps();
         });
     }

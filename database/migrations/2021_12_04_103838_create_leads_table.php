@@ -17,7 +17,7 @@ class CreateLeadsTable extends Migration
             $table->id();
             $table->string('area');
             $table->string('running_leads')->nullable();
-            $table->string('phonenumber');
+            $table->string('phone');
             $table->foreignId('user_id')->onDelete('cascade');
             $table->timestamps();
         });

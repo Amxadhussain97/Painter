@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Lead;
+use App\Models\LinkedSubpainter;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -29,8 +30,6 @@ class UserController extends Controller
         $rules = [
             'email' => 'required|email|unique:users',
             'password' => 'required|min:5',
-
-
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -159,7 +158,7 @@ class UserController extends Controller
         $r = [
             'name' => $request->name,
             'area' => $userId,
-            'phonenumber' => $request->phonenumber,
+            'phone' => $request->phone,
         ];
 
 
@@ -167,28 +166,33 @@ class UserController extends Controller
             $r,
             [
                 'name' => 'required|max:255|min:3',
-                'area' => 'required|exists:users,id',
-                'phone' => 'required|max:255|min:6',
-                'email' => 'required|email',
-                'location' => 'required',
+                'area' => 'required',
+                'phone' => 'required|max:255|min:8',
             ]
         );
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 401);
         }
-        $subpainter = new Certificate();
 
+        $subpainter = User::where('phone', $request->phone)->first();
 
-        $subpainter->name = $request->name;
-        $subpainter->phone =  $request->phone;
-        $subpainter->email =  $request->email;
-        $subpainter->location =  $request->location;
-        $subpainter->save();
+        if (is_null($subpainter)) {
+            $subpainter = new User();
+            $subpainter->name = $request->name;
+            $subpainter->area = $request->area;
+            $subpainter->phone = $request->phone;
+            $subpainter->save();
+       }
+
+        $link = new LinkedSubpainter();
+        $link->painter = $userId;
+        $link->subpainter = $subpainter->id;
+        $link->save();
         return response()->json(
             [
                 "message" => "Success",
-                "subpainter" => $subpainter->makeHidden(['user_id'])
+                "subpainter" => $subpainter
             ],
             201
         );
@@ -198,6 +202,7 @@ class UserController extends Controller
 
     public function updateSubpainter(Request $request, $subpainterId)
     {
+        $userId = $request->user_id;
         $subpainter = Certificate::find($subpainterId);
         if (is_null($subpainter)) {
             return response()->json(["message" => "Record Not Found!"], 404);
@@ -230,13 +235,16 @@ class UserController extends Controller
 
     public function deleteSubpainter(Request $request, $subpainterId)
     {
-        $subpainter = Certificate::find($subpainterId);
+        $userId = $request->user_id;
+        $link = LinkedSubpainter::where('subpainter',$subpainterId)->where('painter',$userId)->first();
 
-        if (is_null($subpainter)) {
+        if (is_null($link))
+        {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
 
-        $subpainter->delete();
+        $link = LinkedSubpainter::where('subpainter',$subpainterId)->where('painter',$userId)->delete();
+
         return response()->json([
             "messsage" => "Deleted successfully"
         ], 204);
