@@ -383,7 +383,7 @@ class UserController extends Controller
         $lead->save();
         return response()->json([
             "message" => "Success",
-            "Lead" => $lead
+            "lead" => $lead
         ], 201);
     }
 
