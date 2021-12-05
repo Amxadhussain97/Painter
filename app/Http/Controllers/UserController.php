@@ -183,7 +183,7 @@ class UserController extends Controller
             $subpainter->area = $request->area;
             $subpainter->phone = $request->phone;
             $subpainter->save();
-       }
+        }
 
         $link = new LinkedSubpainter();
         $link->painter = $userId;
@@ -236,14 +236,13 @@ class UserController extends Controller
     public function deleteSubpainter(Request $request, $subpainterId)
     {
         $userId = $request->user_id;
-        $link = LinkedSubpainter::where('subpainter',$subpainterId)->where('painter',$userId)->first();
+        $link = LinkedSubpainter::where('subpainter', $subpainterId)->where('painter', $userId)->first();
 
-        if (is_null($link))
-        {
+        if (is_null($link)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
 
-        $link = LinkedSubpainter::where('subpainter',$subpainterId)->where('painter',$userId)->delete();
+        $link = LinkedSubpainter::where('subpainter', $subpainterId)->where('painter', $userId)->delete();
 
         return response()->json([
             "messsage" => "Deleted successfully"
@@ -358,7 +357,7 @@ class UserController extends Controller
         $r = [
             'area' => $request->area,
             'running_leads' => $request->running_leads,
-            'phonenumber' => $request->phonenumber,
+            'phone' => $request->phone,
             'user_id' => $userId,
         ];
         $validator = Validator::make(
@@ -366,7 +365,7 @@ class UserController extends Controller
             [
                 'area' => 'required|max:255|min:3',
                 'running_leads' => 'required',
-                'phonenumber' => 'required|min:8',
+                'phone' => 'required|min:8',
             ]
         );
         if ($validator->fails()) {
@@ -378,7 +377,7 @@ class UserController extends Controller
         $lead = new Lead();
 
         $lead->area = $request->area;
-        $lead->phonenumber = $request->phonenumber;
+        $lead->phone = $request->phone;
         $lead->running_leads = $request->running_leads;
         $lead->user_id = $request->user_id;
         $lead->save();
@@ -420,7 +419,7 @@ class UserController extends Controller
         }
         $rules = [
             'running_leads' => 'max:255|min:3required',
-            'phonenumber' => 'min:8',
+            'phone' => 'min:8',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -433,7 +432,7 @@ class UserController extends Controller
 
         $lead->area = is_null($request->area) ? $lead->area : $request->area;
         $lead->running_leads = is_null($request->running_leads) ? $lead->running_leads : $request->running_leads;
-        $lead->phonenumber = is_null($request->phonenumber) ? $lead->phonenumber : $request->phonenumber;
+        $lead->phone = is_null($request->phone) ? $lead->phone : $request->phone;
 
         $lead->save();
 
