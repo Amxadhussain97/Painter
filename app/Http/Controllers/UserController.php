@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Lead;
+use App\Models\LinkedDealer;
 use App\Models\LinkedSubpainter;
 use http\Env\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -185,10 +187,16 @@ class UserController extends Controller
             $subpainter->save();
         }
 
-        $link = new LinkedSubpainter();
-        $link->painter = $userId;
-        $link->subpainter = $subpainter->id;
-        $link->save();
+        $link = LinkedSubpainter::where('subpainter', $subpainter->id)->first();
+        if (is_null($link)) {
+            $link = new LinkedSubpainter();
+            $link->painter = $userId;
+            $link->subpainter = $subpainter->id;
+            $link->save();
+        }
+
+
+
         return response()->json(
             [
                 "message" => "Success",
@@ -232,6 +240,28 @@ class UserController extends Controller
             "subpainter" => $subpainter,
         ], 204);
     }
+    public function getSubpainters(Request $request)
+    {
+        $userId = $request->user_id;
+        // $link = LinkedSubpainter::where('painter', $userId)->all();
+        $subpainters = DB::table('linked_subpainters')->where('painter', '=', $userId)
+            ->join('users', function ($join) {
+                $join->on('users.id', '=', 'linked_subpainters.subpainter');
+            })
+            ->get();
+
+        if ($subpainters->isEmpty()) {
+            return response()->json(["message" => "This User Doesn't have any Subpainter"], 404);
+        }
+
+        return response()->json(
+            [
+                "message" => 'success',
+                "list" => $subpainters
+            ],
+            200
+        );
+    }
 
     public function deleteSubpainter(Request $request, $subpainterId)
     {
@@ -258,10 +288,10 @@ class UserController extends Controller
         $userId = $request->user_id;
 
         $r = [
-            'area' => $request->area,
-            'user_id' => $userId,
-            'phonenumber' => $request->phonenumber,
-            'running_leads' => $request->running_leads,
+            'name' => $request->name,
+            'area' => $userId,
+            'phone' => $request->phone,
+            'email' => $request->email,
         ];
 
 
@@ -269,32 +299,44 @@ class UserController extends Controller
             $r,
             [
                 'name' => 'required|max:255|min:3',
-                'user_id' => 'required|exists:users,id',
-                'phonenumber' => 'required|max:255|min:8',
-                'email' => 'required|email',
-                'location' => 'required',
+                'area' => 'required',
+                'phone' => 'required|max:255|min:8',
+                'email' => 'email',
             ]
         );
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 401);
         }
-        $dealer = new Certificate();
+
+        $dealer = User::where('phone', $request->phone)->first();
+
+        if (is_null($dealer)) {
+            $dealer = new User();
+            $dealer->name = $request->name;
+            $dealer->area = $request->area;
+            $dealer->phone = $request->phone;
+            $dealer->save();
+        }
 
 
-        $dealer->name = $request->name;
-        $dealer->phone =  $request->phone;
-        $dealer->email =  $request->email;
-        $dealer->location =  $request->location;
-        $dealer->save();
+        $link = LinkedDealer::where('dealer', $dealer->id)->first();
+        if (is_null($link)) {
+            $link = new LinkedDealer();
+            $link->painter = $userId;
+            $link->dealer = $dealer->id;
+            $link->save();
+        }
+
         return response()->json(
             [
                 "message" => "Success",
-                "dealer" => $dealer->makeHidden(['user_id'])
+                "dealer" => $dealer
             ],
             201
         );
     }
+
 
 
 
@@ -329,16 +371,40 @@ class UserController extends Controller
             "dealer" => $dealer,
         ], 204);
     }
+    public function getDealers(Request $request)
+    {
+        $userId = $request->user_id;
+
+        $dealers = DB::table('linked_dealers')->where('painter', '=', $userId)
+            ->join('users', function ($join) {
+                $join->on('users.id', '=', 'linked_dealers.dealer');
+            })
+            ->get();
+
+        if ($dealers->isEmpty()) {
+            return response()->json(["message" => "This User Doesn't have any Subpainter"], 404);
+        }
+
+        return response()->json(
+            [
+                "message" => 'success',
+                "list" => $dealers
+            ],
+            200
+        );
+    }
 
     public function deleteDealer(Request $request, $dealerId)
     {
-        $dealer = Certificate::find($dealerId);
+        $userId = $request->user_id;
+        $link = LinkedDealer::where('dealer', $dealerId)->where('painter', $userId)->first();
 
-        if (is_null($dealer)) {
+        if (is_null($link)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
 
-        $dealer->delete();
+        $link = LinkedDealer::where('dealer', $dealerId)->where('painter', $userId)->delete();
+
         return response()->json([
             "messsage" => "Deleted successfully"
         ], 204);
@@ -386,6 +452,7 @@ class UserController extends Controller
             "lead" => $lead
         ], 201);
     }
+
 
 
 

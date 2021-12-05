@@ -16,6 +16,7 @@ class CreateLinkedDealersTable extends Migration
         Schema::create('linked_dealers', function (Blueprint $table) {
             $table->string('painter');
             $table->string('dealer');
+            $table->primary(['painter', 'dealer']);
             $table->timestamps();
         });
     }
