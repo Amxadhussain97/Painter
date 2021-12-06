@@ -33,7 +33,6 @@ Route::post("login", [UserController::class, 'login']);
 
 Route::group(["middleware" => ["auth:api"]], function () {
 
-
     Route::get("profile", [UserController::class, 'profile']);
     Route::get("logout", [UserController::class, 'logout']);
     Route::post("profile", [UserController::class, 'updateProfile']);
