@@ -316,6 +316,7 @@ class UserController extends Controller
             $dealer->name = $request->name;
             $dealer->area = $request->area;
             $dealer->phone = $request->phone;
+            $dealer->email = $request->email;
             $dealer->save();
         }
 
