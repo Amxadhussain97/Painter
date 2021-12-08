@@ -49,7 +49,7 @@ class User extends Authenticatable implements JWTSubject
         'rocket',
         'bkash',
         'nogod',
-        'phonenumber',
+        'phone',
         'role',
     ];
 

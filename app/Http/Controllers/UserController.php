@@ -127,6 +127,7 @@ class UserController extends Controller
             'role' => 'max:10|',
 
         ];
+
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 401);
@@ -143,6 +144,7 @@ class UserController extends Controller
             $user->imagePath = "Photos/" . $filename;
         }
         $user->update($request->except(['imagePath', 'id']));
+
         return response()->json([
             "message" => "Updated Successfully"
         ], 204);
