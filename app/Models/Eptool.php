@@ -17,4 +17,5 @@ class Eptool extends Model
     {
         return $this->hasMany(Epphoto::class);
     }
+   
 }

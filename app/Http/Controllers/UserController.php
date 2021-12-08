@@ -158,8 +158,6 @@ class UserController extends Controller
         $userId = $request->user_id;
 
         $r = [
-            'name' => $request->name,
-            'area' => $userId,
             'phone' => $request->phone,
         ];
 
@@ -167,9 +165,9 @@ class UserController extends Controller
         $validator = Validator::make(
             $r,
             [
-                'name' => 'required|max:255|min:3',
-                'area' => 'required',
-                'phone' => 'required|max:255|min:8',
+                // 'name' => 'required|max:255|min:3',
+                // 'area' => 'required',
+                'phone' => 'required|max:255|min:8|exists:users,phone',
             ]
         );
         if ($validator->fails()) {
@@ -179,13 +177,13 @@ class UserController extends Controller
 
         $subpainter = User::where('phone', $request->phone)->first();
 
-        if (is_null($subpainter)) {
-            $subpainter = new User();
-            $subpainter->name = $request->name;
-            $subpainter->area = $request->area;
-            $subpainter->phone = $request->phone;
-            $subpainter->save();
-        }
+        // if (is_null($subpainter)) {
+        //     $subpainter = new User();
+        //     $subpainter->name = $request->name;
+        //     $subpainter->area = $request->area;
+        //     $subpainter->phone = $request->phone;
+        //     $subpainter->save();
+        // }
 
         $link = LinkedSubpainter::where('subpainter', $subpainter->id)->first();
         if (is_null($link)) {
