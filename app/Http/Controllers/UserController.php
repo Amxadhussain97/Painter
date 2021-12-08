@@ -118,7 +118,7 @@ class UserController extends Controller
             'gender' => 'max:6',
             'imagePath' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             // 'birthDate' => 'date',
-            'phonenumber' => 'min:8',
+            'phone' => 'min:8',
             'area' => 'max:20|',
             'bankName' => 'max:20|',
             'rocket' => 'max:20|',
