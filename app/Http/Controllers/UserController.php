@@ -303,8 +303,8 @@ class UserController extends Controller
         $validator = Validator::make(
             $r,
             [
-                'name' => 'required|max:255|min:3',
-                'area' => 'required',
+                'name' => 'max:255|min:3',
+                'area' => '',
                 'phone' => 'required|max:255|min:8',
                 'email' => 'email',
             ]
@@ -388,7 +388,7 @@ class UserController extends Controller
             ->get();
 
         if ($dealers->isEmpty()) {
-            return response()->json(["message" => "This User Doesn't have any Subpainter"], 404);
+            return response()->json(["message" => "This User Doesn't have any Dealer"], 404);
         }
 
         return response()->json(
