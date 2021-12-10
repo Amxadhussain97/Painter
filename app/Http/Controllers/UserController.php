@@ -268,7 +268,13 @@ class UserController extends Controller
         //dd($userId,$subpainterId);
         $link = LinkedSubpainter::where('subpainter', $subpainterId)->where('painter', $userId)->first();
         if (is_null($link)) {
-            return response()->json(["message" => "Record Not Found!"], 404);
+            return response()->json([
+                "message" => "Record Not Found!",
+                "userid" => $userId,
+                "subpainter" => $subpainterId,
+
+
+            ], 404);
         }
 
         $link = LinkedSubpainter::where('subpainter', $subpainterId)->where('painter', $userId)->delete();
