@@ -158,7 +158,6 @@ class UserController extends Controller
     public function postSubpainter(Request $request)
     {
         $userId = $request->user_id;
-        dd($request->read);
         $r = [
             'phone' => $request->phone,
         ];
@@ -266,6 +265,7 @@ class UserController extends Controller
     public function deleteSubpainter(Request $request, $subpainterId)
     {
         $userId = $request->user_id;
+        dd($userId,$subpainterId);
         $link = LinkedSubpainter::where('subpainter', $subpainterId)->where('painter', $userId)->first();
 
         if (is_null($link)) {
