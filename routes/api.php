@@ -38,7 +38,11 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::post("profile", [UserController::class, 'updateProfile']);
 
 
-    Route::group(['middleware' => ['userMiddleware,cors']], function () {
+    Route::group([
+        'middleware' => ['userMiddleware','cors']
+
+
+], function () {
         Route::get("users", [AdminController::class, 'getUsers']); // TO GET ALL USERS
         Route::post('users/{User::id}', [AdminController::class, 'updateUser']); // TO UPDATE AN USER
         Route::get('users/{User::id}', [AdminController::class, 'getUser']); // TO UPDATE AN USER
