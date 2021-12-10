@@ -20,8 +20,6 @@ class userMiddleware
     {
 
 
-
-
         $userId = auth()->user()->id;
         $user = User::where('id', $userId)->first();
 
