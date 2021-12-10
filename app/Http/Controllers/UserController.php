@@ -158,7 +158,7 @@ class UserController extends Controller
     public function postSubpainter(Request $request)
     {
         $userId = $request->user_id;
-
+        dd($request->phone);
         $r = [
             'phone' => $request->phone,
         ];
