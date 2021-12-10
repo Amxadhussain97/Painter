@@ -26,7 +26,7 @@ use \App\Http\Controllers\AdminController;
 //    return $request->user();
 //});
 
-//Route::get('/test/otp-request', [UserController::class,'requestForOtp']);
+//Routse::get('/test/otp-request', [UserController::class,'requestForOtp']);
 
 Route::post("register", [UserController::class, 'register']);
 Route::post("login", [UserController::class, 'login'])->name('login');
