@@ -29,7 +29,7 @@ use \App\Http\Controllers\AdminController;
 //Route::get('/test/otp-request', [UserController::class,'requestForOtp']);
 
 Route::post("register", [UserController::class, 'register']);
-Route::post("login", [UserController::class, 'login']);
+Route::post("login", [UserController::class, 'login'])->name('login');
 
 Route::group(["middleware" => ["auth:api"]], function () {
 
@@ -38,7 +38,7 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::post("profile", [UserController::class, 'updateProfile']);
 
 
-    Route::group(['middleware' => 'userMiddleware'], function () {
+    Route::group(['middleware' => ['userMiddleware','jwt.verify']], function () {
         Route::get("users", [AdminController::class, 'getUsers']); // TO GET ALL USERS
         Route::post('users/{User::id}', [AdminController::class, 'updateUser']); // TO UPDATE AN USER
         Route::get('users/{User::id}', [AdminController::class, 'getUser']); // TO UPDATE AN USER
