@@ -291,7 +291,7 @@ class UserController extends Controller
     public function postDealer(Request $request)
     {
         $userId = $request->user_id;
-
+        //dd($request->name);
         $r = [
             'name' => $request->name,
             'area' => $userId,
