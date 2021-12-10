@@ -491,7 +491,7 @@ class UserController extends Controller
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         $rules = [
-            'running_leads' => 'max:255|min:3required',
+            'running_leads' => 'max:255|min:3',
             'phone' => 'min:8',
         ];
 

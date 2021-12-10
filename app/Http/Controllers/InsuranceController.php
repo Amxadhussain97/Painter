@@ -120,11 +120,11 @@ class InsuranceController extends Controller
      */
     public function deleteInsurance(Request $request, $insuranceId)
     {
-        $userId = $request->user_id;
+        // $userId = $request->user_id;
 
         $insurance = Insurance::find($insuranceId);
 
-        if (is_null($insurance) || $insurance->user_id != $userId) {
+        if (is_null($insurance)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
 
