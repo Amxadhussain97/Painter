@@ -20,16 +20,15 @@ use \App\Http\Controllers\AdminController;
 |
 */
 
-
-
 //Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
-
 //Routse::get('/test/otp-request', [UserController::class,'requestForOtp']);
 
 Route::post("register", [UserController::class, 'register']);
 Route::post("login", [UserController::class, 'login'])->name('login');
+Route::post("reset", [UserController::class, 'forgot']);
+Route::view('forgot_password', 'auth.reset_password')->name('password.reset');
 
 Route::group(["middleware" => ["auth:api"]], function () {
 
@@ -89,6 +88,8 @@ Route::group(["middleware" => ["auth:api"]], function () {
         Route::get('leads', [UserController::class, 'getLeads']); // TO GET GALLERIES OF AN USER
         Route::post('leads/{Lead::id}', [UserController::class, 'updateLead']); // TO UPDATE AN USER'S GALLERY
         Route::delete('leads/{Lead::id}', [UserController::class, 'deleteLead']); // TO DELETE AN USER'S GALLERY
+
+        Route::get('search', [UserController::class, 'searchUsers']); // TO GET EPTOOL OF AN USER
 
 
 

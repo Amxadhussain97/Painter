@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Notifications\PasswordResetNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -72,6 +74,20 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
+    public function  subdistrict()
+    {
+        return $this->belongsTo(Subdistrict::class);
+    }
+   
+
+
+
+
+
+
+
+
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -79,5 +95,10 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+    public function sendPasswordResetNotification($token)
+    {
+
+        $this->notify(new PasswordResetNotification($token));
     }
 }

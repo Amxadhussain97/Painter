@@ -28,6 +28,8 @@ class CreateUsersTable extends Migration
             $table->string('bkash')->nullable();
             $table->string('phone')->nullable();
             $table->string('nogod')->nullable();
+            $table->unsignedBigInteger('subdistrict_id')->nullable();
+            $table->foreign('subdistrict_id')->references('id')->on('subdistricts')->onDelete('cascade');
             $table->string('role')->nullable();
             $table->rememberToken();
             $table->timestamps();

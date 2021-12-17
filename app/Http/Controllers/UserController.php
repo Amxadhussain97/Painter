@@ -6,14 +6,19 @@ use App\Models\User;
 use App\Models\Lead;
 use App\Models\LinkedDealer;
 use App\Models\LinkedSubpainter;
+use Exception;
+use GuzzleHttp\Psr7\Message as Psr7Message;
 use http\Env\Response;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-
-
-
-
+use Nette\Schema\Message as SchemaMessage;
+use Symfony\Component\Mime\Message as MimeMessage;
 
 class UserController extends Controller
 {
@@ -22,14 +27,97 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function change_password(Request $request)
+    {
+        $input = $request->all();
+        $userid = Auth::guard('api')->user()->id;
+        $rules = array(
+            'old_password' => 'required',
+            'new_password' => 'required|min:6',
+            'confirm_password' => 'required|same:new_password',
+        );
+        $validator = Validator::make($input, $rules);
+        if ($validator->fails()) {
+            $arr = array("status" => 400, "message" => $validator->errors()->first(), "data" => array());
+        } else {
+            try {
 
+                if ((Hash::check(request('old_password'), Auth::user()->password)) == false) {
+                    $arr = array("status" => 400, "message" => "Check your old password.", "data" => array());
+                } else if ((Hash::check(request('new_password'), Auth::user()->password)) == true) {
+                    $arr = array("status" => 400, "message" => "Please enter a password which is not similar then current password.", "data" => array());
+                } else {
+                    User::where('id', $userid)->update(['password' => Hash::make($input['new_password'])]);
+                    $arr = array("status" => 200, "message" => "Password updated successfully.", "data" => array());
+                }
+            } catch (\Exception $ex) {
+                if (isset($ex->errorInfo[2])) {
+                    $msg = $ex->errorInfo[2];
+                } else {
+                    $msg = $ex->getMessage();
+                }
+                $arr = array("status" => 400, "message" => $msg, "data" => array());
+            }
+        }
 
+        return \Response::json($arr);
+    }
+
+    public function reset()
+    {
+        $credentials = request()->validate([
+            'email' => 'required|email',
+            'token' => 'required|string',
+            'password' => 'required|string|confirmed'
+        ]);
+
+        $reset_password_status = Password::reset($credentials, function ($user, $password) {
+            $user->password = $password;
+            $user->save();
+        });
+
+        if ($reset_password_status == Password::INVALID_TOKEN) {
+            return response()->json(["msg" => "Invalid token provided"], 400);
+        }
+
+        return response()->json(["msg" => "Password has been successfully changed"]);
+    }
+
+    public function forgot(Request $request)
+    {
+        // $credentials = request()->validate(['email' => 'required|email']);
+        // $response = Password::sendResetLink($credentials, function (Message $message) {
+        //     $message->subject($this->getEmailSubject());
+        // });
+
+        // switch ($response) {
+        //     case Password::RESET_LINK_SENT:
+        //         return response()->json([
+        //             'status'        => 'success',
+        //             'message' => 'Password reset link send into mail.',
+        //             'data' =>''], 201);
+        //     case Password::INVALID_USER:
+        //         return response()->json([
+        //             'status'        => 'failed',
+        //             'message' =>   'Unable to send password reset link.'
+        //         ], 401);
+        // }
+
+        $credentials = request()->validate(['email' => 'required|email']);
+
+        Password::sendResetLink($credentials);
+
+        return response()->json(["msg" => 'Reset password link sent on your email id.']);
+    }
 
     //User Register Api -POST
     public function register(Request $request)
     {
 
+
         $rules = [
+            'name' => 'required|min:2',
+            'phone' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:5',
         ];
@@ -38,16 +126,35 @@ class UserController extends Controller
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 401);
         }
-        $user = new User();
-        $user->email = $request->email;
-        $user->password = bcrypt($request->password);
-        $user->save();
+
+        $user = User::where('phone', $request->phone)->first();
+
+        if (is_null($user)) {
+            $user = new User();
+            $user->name = $request->name;
+            $user->phone = $request->phone;
+            $user->email = $request->email;
+            if ($request->role) $user->role = $request->role;
+            $user->password = bcrypt($request->password);
+            $user->save();
+        } else if ($user->password != null) {
+            return response()->json(["message" => "user already registered"], 401);
+        } else {
+            $user = User::where('phone', $request->phone)->first();
+            $user->name = $request->name;
+            $user->phone = $request->phone;
+            $user->email = $request->email;
+            if ($request->role) $user->role = $request->role;
+            $user->password = bcrypt($request->password);
+            $user->save();
+        }
+
+
 
         $token = auth()->attempt(["email" => $request->email, "password"  => $request->password]);
         return response()->json([
             "message" => "success",
             "token" => $token,
-            "id" => $user->id,
         ], 201);
     }
 
@@ -527,5 +634,55 @@ class UserController extends Controller
         return response()->json([
             "messsage" => "Deleted successfully"
         ], 204);
+    }
+
+
+    public function searchUsers(Request $request)
+    {
+        // $rules = [
+        //     'search' => 'required | min:2'
+        // ];
+
+        // $validator = Validator::make($request->all(), $rules);
+        // if ($validator->fails()) {
+        //     $error = $validator->errors()->all()[0];
+        //     return response()->json(["message" => $error], 401);
+        // }
+        // $users = User::where('role','Painter')->orwhere('role','Dealer')->get();
+        $users = User::where('role', '<>', 'Admin');
+        if ($request->District) {
+            $district = $request->District;
+            $users = $users->whereHas('subdistrict.district', function ($q) use ($district) {
+                $q->where('name', '=', $district);
+            });
+        }
+
+        if ($request->Subdistrict) {
+            $subdistrict = $request->Subdistrict;
+            $users = $users->whereHas('subdistrict', function ($q) use ($subdistrict) {
+                $q->where('name', '=', $subdistrict);
+            });
+        }
+
+        if (!($request->Painter && $request->Dealer)) {
+            $type = $request->Painter ? $request->Painter : $request->Dealer;
+            if ($type) {
+                $users = $users->where('role', $type);
+            }
+        }
+
+
+        $users = $users->get();
+
+        // dd($users);
+
+
+        return response()->json(
+            [
+                "message" => 'success',
+                "users" => $users
+            ],
+            200
+        );
     }
 }
