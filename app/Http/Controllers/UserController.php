@@ -237,7 +237,7 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 401);
+            return response()->json("message"=> $validator->errors(), 401);
         }
         if ($request->file('imagePath')) {
 
