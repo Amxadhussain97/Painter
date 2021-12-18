@@ -23,7 +23,7 @@ use \App\Http\Controllers\AdminController;
 //Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
-//Routse::get('/test/otp-request', [UserController::class,'requestForOtp']);
+//Routsdde::get('/test/otp-request', [UserController::class,'requestForOtp']);
 
 Route::post("register", [UserController::class, 'register']);
 Route::post("login", [UserController::class, 'login'])->name('login');
