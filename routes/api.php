@@ -32,7 +32,7 @@ Route::view('forgot_password', 'auth.reset_password')->name('password.reset');
 
 // Route::group(["middleware" => ['auth:api','jwt.verify']], function () {
 
-Route::group(['middleware' => ['jwt.verify']], function () {
+Route::group(['middleware' => ['auth:api']], function () {
 
     Route::get("profile", [UserController::class, 'profile']);
     Route::get("logout", [UserController::class, 'logout']);
