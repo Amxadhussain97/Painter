@@ -126,7 +126,7 @@ class UserController extends Controller
 
         $rules = [
             'name' => 'required|min:2',
-            'phone' => 'required',
+            'phone' => 'required|min:5',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:5',
         ];
@@ -233,7 +233,7 @@ class UserController extends Controller
             'email' => 'email',
             'gender' => 'max:6',
             'imagePath' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2050',
-            'phone' => 'min:8',
+            'phone' => 'min:5',
             'area' => 'max:20|',
             'bankName' => 'max:20|',
             'rocket' => 'max:20|',
