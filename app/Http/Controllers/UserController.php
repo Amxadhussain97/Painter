@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\District;
 use App\Models\User;
 use App\Models\Lead;
 use App\Models\LinkedDealer;
 use App\Models\LinkedSubpainter;
+use App\Models\Subdistrict;
 use Exception;
 use GuzzleHttp\Psr7\Message as Psr7Message;
 use http\Env\Response;
@@ -258,7 +260,25 @@ class UserController extends Controller
             $file->move(public_path('Photos'), $filename);
             $user->imagePath = "Photos/" . $filename;
         }
-        $user->update($request->except(['imagePath', 'id']));
+        $user->update($request->except(['imagePath', 'id', 'district', 'subdistrict']));
+        if ($request->district) {
+
+            $district = District::where('name', $request->district)->first();
+            if (is_null($district)) {
+                $district = new District();
+                $district->name = $request->district;
+                $district->save();
+            }
+            $subdistrict = Subdistrict::where('district_id', $district->id)->where('name', $request->subdistrict)->first();
+            if (is_null($subdistrict)) {
+                $subdistrict = new Subdistrict();
+                $subdistrict->name = $request->subdistrict;
+                $subdistrict->district_id = $district->id;
+                $subdistrict->save();
+            }
+            $user->subdistrict_id = $subdistrict->id;
+            $user->save();
+        }
 
         return response()->json([
             "message" => "Updated Successfully"
@@ -409,7 +429,7 @@ class UserController extends Controller
         //dd($request->name);
         $r = [
             'name' => $request->name,
-            'area' => $userId,
+            // 'area' =>
             'phone' => $request->phone,
             'email' => $request->email,
         ];
@@ -437,6 +457,25 @@ class UserController extends Controller
             $dealer->area = $request->area;
             $dealer->phone = $request->phone;
             $dealer->email = $request->email;
+
+            if ($request->district) {
+
+                $district = District::where('name', $request->district)->first();
+                if (is_null($district)) {
+                    $district = new District();
+                    $district->name = $request->district;
+                    $district->save();
+                }
+                $subdistrict = Subdistrict::where('district_id', $district->id)->where('name', $request->subdistrict)->first();
+                if (is_null($subdistrict)) {
+                    $subdistrict = new Subdistrict();
+                    $subdistrict->name = $request->subdistrict;
+                    $subdistrict->district_id = $district->id;
+                    $subdistrict->save();
+                }
+                $dealer->subdistrict_id = $subdistrict->id;
+            }
+
             $dealer->save();
         }
 
@@ -678,7 +717,9 @@ class UserController extends Controller
                 $users = $users->where('role', $type);
             }
         }
-
+        if ($request->search) {
+            $users = $users->where('name', 'like', '%' . $request->search . '%');
+        }
 
         $users = $users->get();
 
