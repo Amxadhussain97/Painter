@@ -462,13 +462,13 @@ class UserController extends Controller
                 $district = District::where('district', $request->district)->first();
                 if (is_null($district)) {
                     $district = new District();
-                    $district->name = $request->district;
+                    $district->district = $request->district;
                     $district->save();
                 }
                 $subdistrict = Subdistrict::where('district_id', $district->id)->where('subdistrict', $request->subdistrict)->first();
                 if (is_null($subdistrict)) {
                     $subdistrict = new Subdistrict();
-                    $subdistrict->name = $request->subdistrict;
+                    $subdistrict->subdistrict = $request->subdistrict;
                     $subdistrict->district_id = $district->id;
                     $subdistrict->save();
                 }
