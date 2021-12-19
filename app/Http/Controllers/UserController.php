@@ -474,7 +474,6 @@ class UserController extends Controller
                 }
                 $dealer->subdistrict_id = $subdistrict->id;
             }
-
             $dealer->save();
         }
 
@@ -537,6 +536,11 @@ class UserController extends Controller
         $dealers = DB::table('linked_dealers')->where('painter', '=', $userId)
             ->join('users', function ($join) {
                 $join->on('users.id', '=', 'linked_dealers.dealer');
+            })
+            ->join('subdistricts', function ($join) {
+                $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+            })->join('districts', function ($join) {
+                $join->on('subdistricts.district_id', '=', 'districts.id');
             })
             ->get();
 
