@@ -696,33 +696,45 @@ class UserController extends Controller
         // }
         // $users = User::where('role','Painter')->orwhere('role','Dealer')->get();
         $users = User::where('role', '<>', 'Admin');
-        if ($request->District) {
-            $district = $request->District;
+
+        if ($request->district) {
+            $district = $request->district;
             $users = $users->whereHas('subdistrict.district', function ($q) use ($district) {
-                $q->where('name', '=', $district);
+                $q->where('district', '=', $district);
             });
         }
 
-        if ($request->Subdistrict) {
-            $subdistrict = $request->Subdistrict;
+
+
+        if ($request->subdistrict) {
+            $subdistrict = $request->subdistrict;
             $users = $users->whereHas('subdistrict', function ($q) use ($subdistrict) {
-                $q->where('name', '=', $subdistrict);
+                $q->where('subdistrict', '=', $subdistrict);
             });
         }
-
-        if (!($request->Painter && $request->Dealer)) {
-            $type = $request->Painter ? $request->Painter : $request->Dealer;
+        // if (!($request->painter && $request->dealer)) {
+        //     $type = $request->painter ? "Painter" : "Dealer";
+        //     if ($type) {
+        //         $users = $users->where('role', $type);
+        //     }
+        // }
+        if ($request->type) {
+            $type = $request->type;
             if ($type) {
                 $users = $users->where('role', $type);
             }
         }
-        if ($request->search) {
-            $users = $users->where('name', 'like', '%' . $request->search . '%');
+        if ($request->q) {
+            $users = $users->where('name', 'like', '%' . $request->q . '%');
         }
+        $users = $users->join('subdistricts', function ($join) {
+            $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+        })->join('districts', function ($join) {
+            $join->on('subdistricts.district_id', '=', 'districts.id');
+        });
 
         $users = $users->get();
 
-        // dd($users);
 
 
         return response()->json(

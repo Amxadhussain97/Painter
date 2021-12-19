@@ -15,7 +15,7 @@ class CreateSubdistrictsTable extends Migration
     {
         Schema::create('subdistricts', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('subdistrict');
             $table->unsignedBigInteger('district_id');
             $table->foreign('district_id')->references('id')->on('districts')->onDelete('cascade');
 
