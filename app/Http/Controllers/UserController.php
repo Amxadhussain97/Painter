@@ -424,13 +424,12 @@ class UserController extends Controller
     public function postDealer(Request $request)
     {
         $userId = $request->user_id;
-        //dd($request->name);
 
         $rules = [
             'name' => 'max:255|min:3',
             'area' => 'max:255|min:3',
-            'phone' => 'required|max:255|min:8',
-            'email' => 'email',
+            'phone' => 'required|max:255|min:5',
+            'email' => 'email|unique:users',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -439,34 +438,31 @@ class UserController extends Controller
             return response()->json(["message" => $error], 401);
         }
 
-        $dealer = User::where('phone', $request->phone)->first();
 
-        if (is_null($dealer)) {
-            $dealer = new User();
-            $dealer->name = $request->name;
-            $dealer->area = $request->area;
-            $dealer->phone = $request->phone;
-            $dealer->email = $request->email;
+        $dealer = new User();
+        $dealer->name = $request->name;
+        $dealer->area = $request->area;
+        $dealer->phone = $request->phone;
+        $dealer->email = $request->email;
 
-            if ($request->district) {
-
-                $district = District::where('district', $request->district)->first();
-                if (is_null($district)) {
-                    $district = new District();
-                    $district->district = $request->district;
-                    $district->save();
-                }
-                $subdistrict = Subdistrict::where('district_id', $district->id)->where('subdistrict', $request->subdistrict)->first();
-                if (is_null($subdistrict)) {
-                    $subdistrict = new Subdistrict();
-                    $subdistrict->subdistrict = $request->subdistrict;
-                    $subdistrict->district_id = $district->id;
-                    $subdistrict->save();
-                }
-                $dealer->subdistrict_id = $subdistrict->id;
+        if ($request->district) {
+            $district = District::where('district', $request->district)->first();
+            if (is_null($district)) {
+                $district = new District();
+                $district->district = $request->district;
+                $district->save();
             }
-            $dealer->save();
+            $subdistrict = Subdistrict::where('district_id', $district->id)->where('subdistrict', $request->subdistrict)->first();
+            if (is_null($subdistrict)) {
+                $subdistrict = new Subdistrict();
+                $subdistrict->subdistrict = $request->subdistrict;
+                $subdistrict->district_id = $district->id;
+                $subdistrict->save();
+            }
+            $dealer->subdistrict_id = $subdistrict->id;
         }
+        $dealer->save();
+
 
 
         $link = LinkedDealer::where('dealer', $dealer->id)->where('painter', $userId)->first();
@@ -547,6 +543,41 @@ class UserController extends Controller
             200
         );
     }
+
+    public function checkDealer(Request $request)
+    {
+        $userId = $request->user_id;
+
+        $rules = [
+            'phone' => 'required|max:255|min:5|exists:users,phone',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
+        } else {
+
+            $dealer = User::where('phone', $request->phone)->first();
+            $link = LinkedDealer::where('dealer', $dealer->id)->where('painter', $userId)->first();
+            if (is_null($link)) {
+                $link = new LinkedDealer();
+                $link->painter = $userId;
+                $link->dealer = $dealer->id;
+                $link->save();
+            }
+
+            return response()->json(
+                [
+                    "message" => "Success",
+                    "dealer" => $dealer
+                ],
+                201
+            );
+        }
+    }
+
+
 
     public function deleteDealer(Request $request, $dealerId)
     {
@@ -736,6 +767,36 @@ class UserController extends Controller
             [
                 "message" => 'success',
                 "users" => $users
+            ],
+            200
+        );
+    }
+
+
+    public function getDistricts(Request $request)
+    {
+        $districts = District::all();
+        return response()->json(
+            [
+                "message" => 'success',
+                "districts" => $districts
+            ],
+            200
+        );
+    }
+    public function getSubDistricts(Request $request, $districtId)
+    {
+
+
+
+        $subdistricts = Subdistrict::where('district_id', $districtId)->get();
+        if ($subdistricts->isEmpty()) {
+            return response()->json(["message" => "No subdistrict found"], 404);
+        }
+        return response()->json(
+            [
+                "message" => 'success',
+                "subdistricts" => $subdistricts
             ],
             200
         );

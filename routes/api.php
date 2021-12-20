@@ -83,6 +83,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
         Route::post('dealers', [UserController::class, 'postDealer']); // TO POST A GALLERY
         Route::get('dealers', [UserController::class, 'getDealers']); // TO GET GALLERIES OF AN USER
+        Route::get('checkdealer', [UserController::class, 'checkDealer']);
         Route::post('dealers/{Dealer::id}', [UserController::class, 'updateDealer']); // TO UPDATE AN USER'S GALLERY
         Route::delete('dealers/{Dealer::id}', [UserController::class, 'deleteDealer']); // TO DELETE AN USER'S GALLERY
 
@@ -91,8 +92,10 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('leads/{Lead::id}', [UserController::class, 'updateLead']); // TO UPDATE AN USER'S GALLERY
         Route::delete('leads/{Lead::id}', [UserController::class, 'deleteLead']); // TO DELETE AN USER'S GALLERY
 
-        Route::get('search', [UserController::class, 'searchUsers']); // TO GET EPTOOL OF AN USER
+        Route::get('search', [UserController::class, 'searchUsers']); // TO SEARCH OF AN USER
 
+        Route::get('districts', [UserController::class, 'getDistricts']); // TO SEARCH OF AN USER
+        Route::get('districts/{District::id}/subdistricts', [UserController::class, 'getSubDistricts']); // TO SEARCH OF AN USER
 
 
     });
