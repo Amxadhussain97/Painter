@@ -292,19 +292,12 @@ class UserController extends Controller
     public function postSubpainter(Request $request)
     {
         $userId = $request->user_id;
-        $r = [
-            'phone' => $request->phone,
+
+        $rules = [
+            'phone' => 'required|max:255|min:5|exists:users,phone',
         ];
 
-
-        $validator = Validator::make(
-            $r,
-            [
-                // 'name' => 'required|max:255|min:3',
-                // 'area' => 'required',
-                'phone' => 'required|max:255|min:8|exists:users,phone',
-            ]
-        );
+        $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 401);
@@ -320,7 +313,7 @@ class UserController extends Controller
         //     $subpainter->save();
         // }
 
-        $link = LinkedSubpainter::where('subpainter', $subpainter->id)->first();
+        $link = LinkedSubpainter::where('subpainter', $subpainter->id)->where('painter', $userId)->first();
         if (is_null($link)) {
             $link = new LinkedSubpainter();
             $link->painter = $userId;
@@ -381,7 +374,13 @@ class UserController extends Controller
             ->join('users', function ($join) {
                 $join->on('users.id', '=', 'linked_subpainters.subpainter');
             })
+            ->leftjoin('subdistricts', function ($join) {
+                $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+            })->leftjoin('districts', function ($join) {
+                $join->on('subdistricts.district_id', '=', 'districts.id');
+            })
             ->get();
+
 
         if ($subpainters->isEmpty()) {
             return response()->json(["message" => "This User Doesn't have any Subpainter"], 404);
@@ -426,23 +425,15 @@ class UserController extends Controller
     {
         $userId = $request->user_id;
         //dd($request->name);
-        $r = [
-            'name' => $request->name,
-            // 'area' =>
-            'phone' => $request->phone,
-            'email' => $request->email,
+
+        $rules = [
+            'name' => 'max:255|min:3',
+            'area' => 'max:255|min:3',
+            'phone' => 'required|max:255|min:8',
+            'email' => 'email',
         ];
 
-
-        $validator = Validator::make(
-            $r,
-            [
-                'name' => 'max:255|min:3',
-                'area' => 'max:255|min:3',
-                'phone' => 'required|max:255|min:8',
-                'email' => 'email',
-            ]
-        );
+        $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 401);
@@ -478,7 +469,7 @@ class UserController extends Controller
         }
 
 
-        $link = LinkedDealer::where('dealer', $dealer->id)->first();
+        $link = LinkedDealer::where('dealer', $dealer->id)->where('painter', $userId)->first();
         if (is_null($link)) {
             $link = new LinkedDealer();
             $link->painter = $userId;
@@ -535,11 +526,11 @@ class UserController extends Controller
 
         $dealers = DB::table('linked_dealers')->where('painter', '=', $userId)
             ->join('users', function ($join) {
-                $join->on('users.id', '=', 'linked_dealers.dealer');
+                $join->on('linked_dealers.dealer', '=', 'users.id');
             })
-            ->join('subdistricts', function ($join) {
+            ->leftjoin('subdistricts', function ($join) {
                 $join->on('users.subdistrict_id', '=', 'subdistricts.id');
-            })->join('districts', function ($join) {
+            })->leftjoin('districts', function ($join) {
                 $join->on('subdistricts.district_id', '=', 'districts.id');
             })
             ->get();
@@ -731,9 +722,9 @@ class UserController extends Controller
         if ($request->q) {
             $users = $users->where('name', 'like', '%' . $request->q . '%');
         }
-        $users = $users->join('subdistricts', function ($join) {
+        $users = $users->leftjoin('subdistricts', function ($join) {
             $join->on('users.subdistrict_id', '=', 'subdistricts.id');
-        })->join('districts', function ($join) {
+        })->leftjoin('districts', function ($join) {
             $join->on('subdistricts.district_id', '=', 'districts.id');
         });
 
