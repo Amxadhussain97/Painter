@@ -76,10 +76,10 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('galleries/{Gallery::id}/photos/{Photo::id}', [GalleryController::class, 'updateUserPhoto']); // TO UPDATE A GALLERY PHOTO
         Route::delete('galleries/{Gallery::id}/photos/{Photo::id}', [GalleryController::class, 'deleteUserPhoto']); // TO DELETE A GALLERY PHOTO
 
-        Route::post('subpainters', [UserController::class, 'postSubpainter']); // TO POST A GALLERY
-        Route::get('subpainters', [UserController::class, 'getSubpainters']); // TO GET GALLERIES OF AN USER
-        Route::post('subpainters/{Subpainter::id}', [UserController::class, 'updateSubpainter']); // TO UPDATE AN USER'S GALLERY
-        Route::delete('subpainters/{Subpainter::id}', [UserController::class, 'deleteSubpainter']); // TO DELETE AN USER'S GALLERY
+        Route::post('subuser', [UserController::class, 'postSubuser']); // TO POST A GALLERY
+        Route::get('subusers', [UserController::class, 'getSubusers']); // TO GET GALLERIES OF AN USER
+        Route::post('subusers/{Subpainter::id}', [UserController::class, 'updateSubuser']); // TO UPDATE AN USER'S GALLERY
+        Route::delete('subusers/{Subpainter::id}', [UserController::class, 'deleteSubuser']); // TO DELETE AN USER'S GALLERY
 
         Route::post('dealers', [UserController::class, 'postDealer']); // TO POST A GALLERY
         Route::get('dealers', [UserController::class, 'getDealers']); // TO GET GALLERIES OF AN USER

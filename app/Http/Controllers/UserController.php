@@ -6,6 +6,7 @@ use App\Models\District;
 use App\Models\User;
 use App\Models\Lead;
 use App\Models\LinkedDealer;
+use App\Models\LinkedSubdealer;
 use App\Models\LinkedSubpainter;
 use App\Models\Subdistrict;
 use Exception;
@@ -289,12 +290,13 @@ class UserController extends Controller
 
 
 
-    public function postSubpainter(Request $request)
+    public function postSubuser(Request $request)
     {
         $userId = $request->user_id;
 
         $rules = [
             'phone' => 'required|max:255|min:5|exists:users,phone',
+            'type' => 'required'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -303,7 +305,7 @@ class UserController extends Controller
             return response()->json(["message" => $error], 401);
         }
 
-        $subpainter = User::where('phone', $request->phone)->first();
+        $subuser = User::where('phone', $request->phone)->first();
 
         // if (is_null($subpainter)) {
         //     $subpainter = new User();
@@ -313,20 +315,32 @@ class UserController extends Controller
         //     $subpainter->save();
         // }
 
-        $link = LinkedSubpainter::where('subpainter', $subpainter->id)->where('painter', $userId)->first();
-        if (is_null($link)) {
-            $link = new LinkedSubpainter();
-            $link->painter = $userId;
-            $link->subpainter = $subpainter->id;
-            $link->save();
+        if ($request->type == 'Painter') {
+            $link = LinkedSubpainter::where('subpainter', $subuser->id)->where('painter', $userId)->first();
+            if (is_null($link)) {
+                $link = new LinkedSubpainter();
+                $link->painter = $userId;
+                $link->subpainter = $subuser->id;
+                $link->save();
+            }
         }
+        else{
+            $link = LinkedSubdealer::where('subdealer', $subuser->id)->where('painter', $userId)->first();
+            if (is_null($link)) {
+                $link = new LinkedSubdealer();
+                $link->painter = $userId;
+                $link->subdealer = $subuser->id;
+                $link->save();
+            }
+        }
+
 
 
 
         return response()->json(
             [
                 "message" => "Success",
-                "subpainter" => $subpainter
+                "subuser" => $subuser
             ],
             201
         );
@@ -334,7 +348,7 @@ class UserController extends Controller
 
 
 
-    public function updateSubpainter(Request $request, $subpainterId)
+    public function updateSubuser(Request $request, $subpainterId)
     {
         $userId = $request->user_id;
         $subpainter = Certificate::find($subpainterId);
@@ -366,7 +380,7 @@ class UserController extends Controller
             "subpainter" => $subpainter,
         ], 204);
     }
-    public function getSubpainters(Request $request)
+    public function getSubusers(Request $request)
     {
         $userId = $request->user_id;
         // $link = LinkedSubpainter::where('painter', $userId)->all();
@@ -395,7 +409,7 @@ class UserController extends Controller
         );
     }
 
-    public function deleteSubpainter(Request $request, $subpainterId)
+    public function deleteSubuser(Request $request, $subpainterId)
     {
         $userId = $request->user_id;
         //dd($userId,$subpainterId);
@@ -723,7 +737,7 @@ class UserController extends Controller
         // $users = User::where('role','Painter')->orwhere('role','Dealer')->get();
         $users = User::where('role', '<>', 'Admin');
 
-        if ($request->district) {
+        if (!is_null($request->district)) {
             $district = $request->district;
             $users = $users->whereHas('subdistrict.district', function ($q) use ($district) {
                 $q->where('district', '=', $district);
@@ -732,7 +746,7 @@ class UserController extends Controller
 
 
 
-        if ($request->subdistrict) {
+        if (!is_null($request->subdistrict)) {
             $subdistrict = $request->subdistrict;
             $users = $users->whereHas('subdistrict', function ($q) use ($subdistrict) {
                 $q->where('subdistrict', '=', $subdistrict);
@@ -744,13 +758,13 @@ class UserController extends Controller
         //         $users = $users->where('role', $type);
         //     }
         // }
-        if ($request->type) {
+        if (!is_null($request->type)) {
             $type = $request->type;
             if ($type) {
                 $users = $users->where('role', $type);
             }
         }
-        if ($request->q) {
+        if (!is_null($request->q)) {
             $users = $users->where('name', 'like', '%' . $request->q . '%');
         }
         $users = $users->leftjoin('subdistricts', function ($join) {
