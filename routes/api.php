@@ -76,16 +76,16 @@ Route::group(['middleware' => ['auth:api']], function () {
         Route::post('galleries/{Gallery::id}/photos/{Photo::id}', [GalleryController::class, 'updateUserPhoto']); // TO UPDATE A GALLERY PHOTO
         Route::delete('galleries/{Gallery::id}/photos/{Photo::id}', [GalleryController::class, 'deleteUserPhoto']); // TO DELETE A GALLERY PHOTO
 
-        Route::post('subuser', [UserController::class, 'postSubuser']); // TO POST A GALLERY
+        Route::post('subusers', [UserController::class, 'postSubuser']); // TO POST A GALLERY
         Route::get('subusers', [UserController::class, 'getSubusers']); // TO GET GALLERIES OF AN USER
-        Route::post('subusers/{Subpainter::id}', [UserController::class, 'updateSubuser']); // TO UPDATE AN USER'S GALLERY
-        Route::delete('subusers/{Subpainter::id}', [UserController::class, 'deleteSubuser']); // TO DELETE AN USER'S GALLERY
+        Route::post('subusers/{Subuser::id}', [UserController::class, 'updateSubuser']); // TO UPDATE AN USER'S GALLERY
+        Route::delete('subusers/{Subuser::id}', [UserController::class, 'deleteSubuser']); // TO DELETE AN USER'S GALLERY
 
-        Route::post('dealers', [UserController::class, 'postDealer']); // TO POST A GALLERY
-        Route::get('dealers', [UserController::class, 'getDealers']); // TO GET GALLERIES OF AN USER
-        Route::get('checkdealer', [UserController::class, 'checkDealer']);
-        Route::post('dealers/{Dealer::id}', [UserController::class, 'updateDealer']); // TO UPDATE AN USER'S GALLERY
-        Route::delete('dealers/{Dealer::id}', [UserController::class, 'deleteDealer']); // TO DELETE AN USER'S GALLERY
+        Route::post('linkedusers', [UserController::class, 'postLinkeduser']); // TO POST A GALLERY
+        Route::get('linkedusers', [UserController::class, 'getLinkedusers']); // TO GET GALLERIES OF AN USER
+        Route::get('checklinkeduser', [UserController::class, 'checkLinkeduser']);
+        Route::post('linkedusers/{Linkeduser::id}', [UserController::class, 'updatLinkeduser']); // TO UPDATE AN USER'S GALLERY
+        Route::delete('linkedusers/{Linkeduser::id}', [UserController::class, 'deleteLinkeduser']); // TO DELETE AN USER'S GALLERY
 
         Route::post('leads', [UserController::class, 'postLead']); // TO POST A GALLERY
         Route::get('leads', [UserController::class, 'getLeads']); // TO GET GALLERIES OF AN USER

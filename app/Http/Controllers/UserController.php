@@ -8,7 +8,9 @@ use App\Models\Lead;
 use App\Models\LinkedDealer;
 use App\Models\LinkedSubdealer;
 use App\Models\LinkedSubpainter;
+use App\Models\LinkedUser;
 use App\Models\Subdistrict;
+use App\Models\Subuser;
 use Exception;
 use GuzzleHttp\Psr7\Message as Psr7Message;
 use http\Env\Response;
@@ -296,7 +298,7 @@ class UserController extends Controller
 
         $rules = [
             'phone' => 'required|max:255|min:5|exists:users,phone',
-            'type' => 'required'
+            'link' => 'required'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -307,6 +309,9 @@ class UserController extends Controller
 
         $subuser = User::where('phone', $request->phone)->first();
 
+        if ($subuser->role != $request->link) {
+            return response()->json(["message" => "This user doesn't have your desired role"], 401);
+        }
         // if (is_null($subpainter)) {
         //     $subpainter = new User();
         //     $subpainter->name = $request->name;
@@ -315,23 +320,13 @@ class UserController extends Controller
         //     $subpainter->save();
         // }
 
-        if ($request->type == 'Painter') {
-            $link = LinkedSubpainter::where('subpainter', $subuser->id)->where('painter', $userId)->first();
-            if (is_null($link)) {
-                $link = new LinkedSubpainter();
-                $link->painter = $userId;
-                $link->subpainter = $subuser->id;
-                $link->save();
-            }
-        }
-        else{
-            $link = LinkedSubdealer::where('subdealer', $subuser->id)->where('painter', $userId)->first();
-            if (is_null($link)) {
-                $link = new LinkedSubdealer();
-                $link->painter = $userId;
-                $link->subdealer = $subuser->id;
-                $link->save();
-            }
+        $link = Subuser::where('subuser', $subuser->id)->where('user', $userId)->first();
+        if (is_null($link)) {
+            $link = new Subuser();
+            $link->user = $userId;
+            $link->subuser = $subuser->id;
+            $link->link = $request->link;
+            $link->save();
         }
 
 
@@ -384,9 +379,9 @@ class UserController extends Controller
     {
         $userId = $request->user_id;
         // $link = LinkedSubpainter::where('painter', $userId)->all();
-        $subpainters = DB::table('linked_subpainters')->where('painter', '=', $userId)
+        $subusers = DB::table('subusers')->where('user', '=', $userId)
             ->join('users', function ($join) {
-                $join->on('users.id', '=', 'linked_subpainters.subpainter');
+                $join->on('users.id', '=', 'subusers.subuser');
             })
             ->leftjoin('subdistricts', function ($join) {
                 $join->on('users.subdistrict_id', '=', 'subdistricts.id');
@@ -396,35 +391,33 @@ class UserController extends Controller
             ->get();
 
 
-        if ($subpainters->isEmpty()) {
+        if ($subusers->isEmpty()) {
             return response()->json(["message" => "This User Doesn't have any Subpainter"], 404);
         }
 
         return response()->json(
             [
                 "message" => 'success',
-                "list" => $subpainters
+                "list" => $subusers
             ],
             200
         );
     }
 
-    public function deleteSubuser(Request $request, $subpainterId)
+    public function deleteSubuser(Request $request, $subuserId)
     {
         $userId = $request->user_id;
         //dd($userId,$subpainterId);
-        $link = LinkedSubpainter::where('subpainter', $subpainterId)->where('painter', $userId)->first();
+        $link = Subuser::where('subuser', $subuserId)->where('user', $userId)->first();
         if (is_null($link)) {
             return response()->json([
-                "message" => "Record Not Found!",
-                "userid" => $userId,
-                "subpainter" => $subpainterId,
+                "message" => "Record Not Found!"
 
 
             ], 404);
         }
 
-        $link = LinkedSubpainter::where('subpainter', $subpainterId)->where('painter', $userId)->delete();
+        $link = Subuser::where('subuser', $subuserId)->where('user', $userId)->delete();
 
         return response()->json([
             "messsage" => "Deleted successfully"
@@ -435,7 +428,7 @@ class UserController extends Controller
 
     //Dealer Starts
 
-    public function postDealer(Request $request)
+    public function postLinkeduser(Request $request)
     {
         $userId = $request->user_id;
 
@@ -444,6 +437,7 @@ class UserController extends Controller
             'area' => 'max:255|min:3',
             'phone' => 'required|max:255|min:5',
             'email' => 'email|unique:users',
+            'link' => 'required'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -453,11 +447,14 @@ class UserController extends Controller
         }
 
 
-        $dealer = new User();
-        $dealer->name = $request->name;
-        $dealer->area = $request->area;
-        $dealer->phone = $request->phone;
-        $dealer->email = $request->email;
+
+
+
+        $linkeduser = new User();
+        $linkeduser->name = $request->name;
+        $linkeduser->area = $request->area;
+        $linkeduser->phone = $request->phone;
+        $linkeduser->email = $request->email;
 
         if ($request->district) {
             $district = District::where('district', $request->district)->first();
@@ -473,24 +470,24 @@ class UserController extends Controller
                 $subdistrict->district_id = $district->id;
                 $subdistrict->save();
             }
-            $dealer->subdistrict_id = $subdistrict->id;
+            $linkeduser->subdistrict_id = $subdistrict->id;
         }
-        $dealer->save();
+        $linkeduser->save();
 
 
-
-        $link = LinkedDealer::where('dealer', $dealer->id)->where('painter', $userId)->first();
+        $link = LinkedUser::where('linkeduser', $linkeduser->id)->where('user', $userId)->first();
         if (is_null($link)) {
-            $link = new LinkedDealer();
-            $link->painter = $userId;
-            $link->dealer = $dealer->id;
+            $link = new LinkedUser();
+            $link->user = $userId;
+            $link->linkeduser = $linkeduser->id;
+            $link->link = $request->link;
             $link->save();
         }
 
         return response()->json(
             [
                 "message" => "Success",
-                "dealer" => $dealer
+                "linkeduser" => $linkeduser
             ],
             201
         );
@@ -499,7 +496,7 @@ class UserController extends Controller
 
 
 
-    public function updateDealer(Request $request, $dealerId)
+    public function updateLinkeduser(Request $request, $dealerId)
     {
         $dealer = Certificate::find($dealerId);
         if (is_null($dealer)) {
@@ -530,13 +527,13 @@ class UserController extends Controller
             "dealer" => $dealer,
         ], 204);
     }
-    public function getDealers(Request $request)
+    public function getLinkedusers(Request $request)
     {
         $userId = $request->user_id;
 
-        $dealers = DB::table('linked_dealers')->where('painter', '=', $userId)
+        $linkedusers = DB::table('linked_users')->where('user', '=', $userId)
             ->join('users', function ($join) {
-                $join->on('linked_dealers.dealer', '=', 'users.id');
+                $join->on('linked_users.linkeduser', '=', 'users.id');
             })
             ->leftjoin('subdistricts', function ($join) {
                 $join->on('users.subdistrict_id', '=', 'subdistricts.id');
@@ -545,20 +542,20 @@ class UserController extends Controller
             })
             ->get();
 
-        if ($dealers->isEmpty()) {
-            return response()->json(["message" => "This User Doesn't have any Dealer"], 404);
+        if ($linkedusers->isEmpty()) {
+            return response()->json(["message" => "This User Doesn't have any Linked Users"], 404);
         }
 
         return response()->json(
             [
                 "message" => 'success',
-                "list" => $dealers
+                "list" => $linkedusers
             ],
             200
         );
     }
 
-    public function checkDealer(Request $request)
+    public function checkLinkeduser(Request $request)
     {
         $userId = $request->user_id;
 
@@ -572,19 +569,27 @@ class UserController extends Controller
             return response()->json(["message" => $error], 401);
         } else {
 
-            $dealer = User::where('phone', $request->phone)->first();
-            $link = LinkedDealer::where('dealer', $dealer->id)->where('painter', $userId)->first();
+            $linkeduser = User::where('phone', $request->phone)->first();
+
+            if ($linkeduser->role != $request->link) {
+                return response()->json(["message" => "This user doesn't have your desired role"], 401);
+            }
+
+
+
+            $link = LinkedUser::where('linkeduser', $linkeduser->id)->where('user', $userId)->first();
             if (is_null($link)) {
-                $link = new LinkedDealer();
-                $link->painter = $userId;
-                $link->dealer = $dealer->id;
+                $link = new LinkedUser();
+                $link->user = $userId;
+                $link->linkeduser = $linkeduser->id;
+                $link->link = $request->link;
                 $link->save();
             }
 
             return response()->json(
                 [
                     "message" => "Success",
-                    "dealer" => $dealer
+                    "dealer" => $linkeduser
                 ],
                 201
             );
@@ -593,16 +598,16 @@ class UserController extends Controller
 
 
 
-    public function deleteDealer(Request $request, $dealerId)
+    public function deleteLinkeduser(Request $request, $linkeduserId)
     {
         $userId = $request->user_id;
-        $link = LinkedDealer::where('dealer', $dealerId)->where('painter', $userId)->first();
+        $link = LinkedUser::where('linkeduser', $linkeduserId)->where('user', $userId)->first();
 
         if (is_null($link)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
 
-        $link = LinkedDealer::where('dealer', $dealerId)->where('painter', $userId)->delete();
+        $link = LinkedUser::where('linkeduser', $linkeduserId)->where('user', $userId)->delete();
 
         return response()->json([
             "messsage" => "Deleted successfully"
