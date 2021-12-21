@@ -263,16 +263,16 @@ class UserController extends Controller
         $user->update($request->except(['imagePath', 'id', 'district', 'subdistrict']));
         if ($request->district) {
 
-            $district = District::where('name', $request->district)->first();
+            $district = District::where('district', $request->district)->first();
             if (is_null($district)) {
                 $district = new District();
-                $district->name = $request->district;
+                $district->district = $request->district;
                 $district->save();
             }
-            $subdistrict = Subdistrict::where('district_id', $district->id)->where('name', $request->subdistrict)->first();
+            $subdistrict = Subdistrict::where('district_id', $district->id)->where('subdistrict', $request->subdistrict)->first();
             if (is_null($subdistrict)) {
                 $subdistrict = new Subdistrict();
-                $subdistrict->name = $request->subdistrict;
+                $subdistrict->subdistrict = $request->subdistrict;
                 $subdistrict->district_id = $district->id;
                 $subdistrict->save();
             }
