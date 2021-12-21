@@ -94,7 +94,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
         Route::get('search', [UserController::class, 'searchUsers']); // TO SEARCH OF AN USER
 
-        Route::get('districts', [UserController::class, 'getDistricts']); // TO SEARCH OF AN USER
+        Route::get('districtsandsubdistricts', [UserController::class, 'getDistrictsSubdistricts']); // TO SEARCH OF AN USER
         Route::get('districts/{District::id}/subdistricts', [UserController::class, 'getSubDistricts']); // TO SEARCH OF AN USER
 
 

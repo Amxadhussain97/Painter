@@ -773,13 +773,15 @@ class UserController extends Controller
     }
 
 
-    public function getDistricts(Request $request)
+    public function getDistrictsSubdistricts(Request $request)
     {
         $districts = District::all();
+        $subdistricts = Subdistrict::all();
         return response()->json(
             [
                 "message" => 'success',
-                "districts" => $districts
+                "districts" => $districts,
+                "subdistricts" => $subdistricts
             ],
             200
         );
