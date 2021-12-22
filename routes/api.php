@@ -27,8 +27,11 @@ use \App\Http\Controllers\AdminController;
 
 Route::post("register", [UserController::class, 'register']);
 Route::post("login", [UserController::class, 'login'])->name('login');
-Route::post("reset", [UserController::class, 'forgot']);
-Route::view('forgot_password', 'auth.reset_password')->name('password.reset');
+Route::post("reset", [UserController::class, 'reset']);
+// Route::view('forgot_password', 'auth.reset_password')->name('password.reset');
+Route::post('forgot', [UserController::class, 'forgot']);
+
+
 
 // Route::group(["middleware" => ['auth:api','jwt.verify']], function () {
 

@@ -23,7 +23,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Nette\Schema\Message as SchemaMessage;
+use Illuminate\Auth\Events\PasswordReset;
 use Symfony\Component\Mime\Message as MimeMessage;
+use Illuminate\Validation\Rules\Password as RulesPassword;
+use Illuminate\Support\Str;
+
+
 
 class UserController extends Controller
 {
@@ -37,62 +42,103 @@ class UserController extends Controller
     //     $this->middleware('auth:api');
     // }
 
+    public function showResetPasswordForm($token) {
+        return view('auth.forgetPasswordLink', ['token' => $token])->with('message', 'Your password has been changed!');;
+     }
+
+     public function submitResetPasswordForm(Request $request)
+     {
 
 
-    public function change_password(Request $request)
-    {
-        $input = $request->all();
-        $userid = Auth::guard('api')->user()->id;
-        $rules = array(
-            'old_password' => 'required',
-            'new_password' => 'required|min:6',
-            'confirm_password' => 'required|same:new_password',
-        );
-        $validator = Validator::make($input, $rules);
-        if ($validator->fails()) {
-            $arr = array("status" => 400, "message" => $validator->errors()->first(), "data" => array());
-        } else {
-            try {
-
-                if ((Hash::check(request('old_password'), Auth::user()->password)) == false) {
-                    $arr = array("status" => 400, "message" => "Check your old password.", "data" => array());
-                } else if ((Hash::check(request('new_password'), Auth::user()->password)) == true) {
-                    $arr = array("status" => 400, "message" => "Please enter a password which is not similar then current password.", "data" => array());
-                } else {
-                    User::where('id', $userid)->update(['password' => Hash::make($input['new_password'])]);
-                    $arr = array("status" => 200, "message" => "Password updated successfully.", "data" => array());
-                }
-            } catch (\Exception $ex) {
-                if (isset($ex->errorInfo[2])) {
-                    $msg = $ex->errorInfo[2];
-                } else {
-                    $msg = $ex->getMessage();
-                }
-                $arr = array("status" => 400, "message" => $msg, "data" => array());
-            }
-        }
-
-        return \Response::json($arr);
-    }
-
-    public function reset()
-    {
-        $credentials = request()->validate([
+        $request->validate([
+            'token' => 'required',
             'email' => 'required|email',
-            'token' => 'required|string',
-            'password' => 'required|string|confirmed'
+            'password' => ['required', 'confirmed', RulesPassword::defaults()],
         ]);
 
-        $reset_password_status = Password::reset($credentials, function ($user, $password) {
-            $user->password = $password;
-            $user->save();
-        });
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user) use ($request) {
+                $user->forceFill([
+                    'password' => Hash::make($request->password),
+                    'remember_token' => Str::random(60),
+                ])->save();
 
-        if ($reset_password_status == Password::INVALID_TOKEN) {
-            return response()->json(["msg" => "Invalid token provided"], 400);
+                $user->tokens()->delete();
+
+                event(new PasswordReset($user));
+            }
+        );
+        if ($status == Password::PASSWORD_RESET) {
+            return back()->withInput()->with('message', 'Password reset successfully');
         }
 
-        return response()->json(["msg" => "Password has been successfully changed"]);
+        // return response([
+        //     'message'=> __($status)
+        // ], 500);
+        return back()->withInput()->with('other', __($status));
+
+
+
+
+
+
+        //  $request->validate([
+        //      'email' => 'required|email|exists:users',
+        //      'password' => 'required|string|min:6|confirmed',
+        //      'password_confirmation' => 'required'
+        //  ]);
+
+        //  $updatePassword = DB::table('password_resets')
+        //                      ->where([
+        //                        'email' => $request->email,
+        //                        'token' => $request->token
+        //                      ])
+        //                      ->first();
+
+        //  if(!$updatePassword){
+             return back()->withInput()->with('message', 'Invalid token!');
+        //  }
+
+        //  $user = User::where('email', $request->email)
+        //              ->update(['password' => Hash::make($request->password)]);
+
+        //  DB::table('password_resets')->where(['email'=> $request->email])->delete();
+
+        //  return redirect('/login')->with('message', 'Your password has been changed!');
+     }
+
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => ['required', 'confirmed', RulesPassword::defaults()],
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user) use ($request) {
+                $user->forceFill([
+                    'password' => Hash::make($request->password),
+                    'remember_token' => Str::random(60),
+                ])->save();
+
+                $user->tokens()->delete();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status == Password::PASSWORD_RESET) {
+            return response([
+                'message'=> 'Password reset successfully'
+            ]);
+        }
+
+        return response([
+            'message'=> __($status)
+        ], 500);
     }
 
     public function forgot(Request $request)
@@ -558,7 +604,7 @@ class UserController extends Controller
     public function checkLinkeduser(Request $request)
     {
         $userId = $request->user_id;
-  
+
         $rules = [
             'phone' => 'required|max:255|min:5|exists:users,phone',
         ];
