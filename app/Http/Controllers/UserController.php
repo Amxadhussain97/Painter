@@ -558,7 +558,7 @@ class UserController extends Controller
     public function checkLinkeduser(Request $request)
     {
         $userId = $request->user_id;
-        dd($request->phone);
+  
         $rules = [
             'phone' => 'required|max:255|min:5|exists:users,phone',
         ];
