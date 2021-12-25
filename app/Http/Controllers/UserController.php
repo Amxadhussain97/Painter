@@ -42,12 +42,13 @@ class UserController extends Controller
     //     $this->middleware('auth:api');
     // }
 
-    public function showResetPasswordForm($token) {
+    public function showResetPasswordForm($token)
+    {
         return view('auth.forgetPasswordLink', ['token' => $token])->with('message', 'Your password has been changed!');;
-     }
+    }
 
-     public function submitResetPasswordForm(Request $request)
-     {
+    public function submitResetPasswordForm(Request $request)
+    {
 
 
         $request->validate([
@@ -97,7 +98,7 @@ class UserController extends Controller
         //                      ->first();
 
         //  if(!$updatePassword){
-             return back()->withInput()->with('message', 'Invalid token!');
+        return back()->withInput()->with('message', 'Invalid token!');
         //  }
 
         //  $user = User::where('email', $request->email)
@@ -106,7 +107,7 @@ class UserController extends Controller
         //  DB::table('password_resets')->where(['email'=> $request->email])->delete();
 
         //  return redirect('/login')->with('message', 'Your password has been changed!');
-     }
+    }
 
     public function reset(Request $request)
     {
@@ -132,12 +133,12 @@ class UserController extends Controller
 
         if ($status == Password::PASSWORD_RESET) {
             return response([
-                'message'=> 'Password reset successfully'
+                'message' => 'Password reset successfully'
             ]);
         }
 
         return response([
-            'message'=> __($status)
+            'message' => __($status)
         ], 500);
     }
 
@@ -341,7 +342,7 @@ class UserController extends Controller
     public function postSubuser(Request $request)
     {
         $userId = $request->user_id;
-
+        $user = User::where('id', $userId)->firstorfail();
         $rules = [
             'phone' => 'required|max:255|min:5|exists:users,phone',
             'link' => 'required'
@@ -351,40 +352,39 @@ class UserController extends Controller
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 401);
+        } else if ($user->phone == $request->phone) {
+            return response()->json(["message" => "Provided phone number can't be matched with your own phone number"], 401);
         }
+        else {
 
-        $subuser = User::where('phone', $request->phone)->first();
+            $subuser = User::where('phone', $request->phone)->first();
+            $subuser->role = strtolower($subuser->role);
+            $request->link = strtolower($request->link);
+            if ($subuser->role != $request->link) {
+                return response()->json(["message" => "This user doesn't have your desired role"], 401);
+            }
+      
 
-        if ($subuser->role != $request->link) {
-            return response()->json(["message" => "This user doesn't have your desired role"], 401);
+            $link = Subuser::where('subuser', $subuser->id)->where('user', $userId)->first();
+            if (is_null($link)) {
+                $link = new Subuser();
+                $link->user = $userId;
+                $link->subuser = $subuser->id;
+                $link->link = $request->link;
+                $link->save();
+            }
+
+
+
+
+            return response()->json(
+                [
+                    "message" => "Success",
+                    "subuser" => $subuser
+                ],
+                201
+            );
         }
-        // if (is_null($subpainter)) {
-        //     $subpainter = new User();
-        //     $subpainter->name = $request->name;
-        //     $subpainter->area = $request->area;
-        //     $subpainter->phone = $request->phone;
-        //     $subpainter->save();
-        // }
-
-        $link = Subuser::where('subuser', $subuser->id)->where('user', $userId)->first();
-        if (is_null($link)) {
-            $link = new Subuser();
-            $link->user = $userId;
-            $link->subuser = $subuser->id;
-            $link->link = $request->link;
-            $link->save();
-        }
-
-
-
-
-        return response()->json(
-            [
-                "message" => "Success",
-                "subuser" => $subuser
-            ],
-            201
-        );
     }
 
 
@@ -477,7 +477,7 @@ class UserController extends Controller
     public function postLinkeduser(Request $request)
     {
         $userId = $request->user_id;
-
+        $user = User::where('id', $userId)->firstorfail();
         $rules = [
             'name' => 'max:255|min:3',
             'area' => 'max:255|min:3',
@@ -490,53 +490,53 @@ class UserController extends Controller
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 401);
-        }
+        } else if ($user->phone == $request->phone) {
+            return response()->json(["message" => "Provided phone number can't be matched with your own phone number"], 401);
+        } else {
 
+            $linkeduser = new User();
+            $linkeduser->name = $request->name;
+            $linkeduser->area = $request->area;
+            $linkeduser->phone = $request->phone;
+            $linkeduser->email = $request->email;
 
-
-
-
-        $linkeduser = new User();
-        $linkeduser->name = $request->name;
-        $linkeduser->area = $request->area;
-        $linkeduser->phone = $request->phone;
-        $linkeduser->email = $request->email;
-
-        if ($request->district) {
-            $district = District::where('district', $request->district)->first();
-            if (is_null($district)) {
-                $district = new District();
-                $district->district = $request->district;
-                $district->save();
+            if ($request->district) {
+                $district = District::where('district', $request->district)->first();
+                if (is_null($district)) {
+                    $district = new District();
+                    $district->district = $request->district;
+                    $district->save();
+                }
+                $subdistrict = Subdistrict::where('district_id', $district->id)->where('subdistrict', $request->subdistrict)->first();
+                if (is_null($subdistrict)) {
+                    $subdistrict = new Subdistrict();
+                    $subdistrict->subdistrict = $request->subdistrict;
+                    $subdistrict->district_id = $district->id;
+                    $subdistrict->save();
+                }
+                $linkeduser->subdistrict_id = $subdistrict->id;
             }
-            $subdistrict = Subdistrict::where('district_id', $district->id)->where('subdistrict', $request->subdistrict)->first();
-            if (is_null($subdistrict)) {
-                $subdistrict = new Subdistrict();
-                $subdistrict->subdistrict = $request->subdistrict;
-                $subdistrict->district_id = $district->id;
-                $subdistrict->save();
+            $linkeduser->save();
+
+
+            $link = LinkedUser::where('linkeduser', $linkeduser->id)->where('user', $userId)->first();
+            if (is_null($link)) {
+                $link = new LinkedUser();
+                $link->user = $userId;
+                $link->linkeduser = $linkeduser->id;
+                $link->link = strtolower($request->link);
+                $link->save();
             }
-            $linkeduser->subdistrict_id = $subdistrict->id;
+
+
+            return response()->json(
+                [
+                    "message" => "Success",
+                    "linkeduser" => $linkeduser
+                ],
+                201
+            );
         }
-        $linkeduser->save();
-
-
-        $link = LinkedUser::where('linkeduser', $linkeduser->id)->where('user', $userId)->first();
-        if (is_null($link)) {
-            $link = new LinkedUser();
-            $link->user = $userId;
-            $link->linkeduser = $linkeduser->id;
-            $link->link = $request->link;
-            $link->save();
-        }
-
-        return response()->json(
-            [
-                "message" => "Success",
-                "linkeduser" => $linkeduser
-            ],
-            201
-        );
     }
 
 
@@ -604,7 +604,7 @@ class UserController extends Controller
     public function checkLinkeduser(Request $request)
     {
         $userId = $request->user_id;
-
+        $user = User::where('id', $userId)->firstorfail();
         $rules = [
             'phone' => 'required|max:255|min:5|exists:users,phone',
         ];
@@ -613,10 +613,13 @@ class UserController extends Controller
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 401);
+        } else if ($user->phone == $request->phone) {
+            return response()->json(["message" => "Provided phone number can't be matched with your own phone number"], 401);
         } else {
 
             $linkeduser = User::where('phone', $request->phone)->first();
-
+            $linkeduser->role = strtolower($linkeduser->role);
+            $request->link = strtolower($request->link);
             if ($linkeduser->role != $request->link) {
                 return response()->json(["message" => "This user doesn't have your desired role"], 401);
             }

@@ -78,13 +78,7 @@ class EptoolController extends Controller
             return response()->json(["message" => $error], 401);
         }
         $eptool = new Eptool();
-        // if ($request->file('image_id')) {
-        //     $file = $request->file('image_id');
-        //     $filename = time() . '.' . $file->extension();
-        //     $file->move(public_path('Eptools'), $filename);
-        //     $eptool->image_id = 'Eptools/' . $filename;
-        // }
-
+  
 
         $eptool->name = $request->name;
         $eptool->model = $request->model;
