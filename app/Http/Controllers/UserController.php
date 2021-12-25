@@ -693,10 +693,13 @@ class UserController extends Controller
             return response()->json(["message" => $error], 401);
         }
 
-
-        $lead = new Lead();
-
-        $lead->number = $request->number;
+        $lead = Lead::where('user_id', $userId)->first();
+        if ($lead) {
+            $lead->number = $request->number;
+        } else {
+            $lead = new Lead();
+            $lead->number = $request->number;
+        }
         $lead->user_id = $userId;
         $lead->save();
         return response()->json([
@@ -722,7 +725,7 @@ class UserController extends Controller
         return response()->json(
             [
                 "message" => 'success',
-                "list" => $lead
+                "lead" => $lead
             ],
             200
         );
