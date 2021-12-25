@@ -354,8 +354,7 @@ class UserController extends Controller
             return response()->json(["message" => $error], 401);
         } else if ($user->phone == $request->phone) {
             return response()->json(["message" => "Provided phone number can't be matched with your own phone number"], 401);
-        }
-        else {
+        } else {
 
             $subuser = User::where('phone', $request->phone)->first();
             $subuser->role = strtolower($subuser->role);
@@ -363,7 +362,13 @@ class UserController extends Controller
             if ($subuser->role != $request->link) {
                 return response()->json(["message" => "This user doesn't have your desired role"], 401);
             }
-      
+            // if (is_null($subpainter)) {
+            //     $subpainter = new User();
+            //     $subpainter->name = $request->name;
+            //     $subpainter->area = $request->area;
+            //     $subpainter->phone = $request->phone;
+            //     $subpainter->save();
+            // }
 
             $link = Subuser::where('subuser', $subuser->id)->where('user', $userId)->first();
             if (is_null($link)) {
@@ -674,17 +679,13 @@ class UserController extends Controller
         $userId = $request->user_id;
 
         $r = [
-            'area' => $request->area,
-            'running_leads' => $request->running_leads,
-            'phone' => $request->phone,
-            'user_id' => $userId,
+            'number' => $request->number,
+
         ];
         $validator = Validator::make(
             $r,
             [
-                'area' => 'required|max:255|min:3',
-                'running_leads' => 'required',
-                'phone' => 'required|min:8',
+                'number' => 'required|max:255|min:1',
             ]
         );
         if ($validator->fails()) {
@@ -695,10 +696,8 @@ class UserController extends Controller
 
         $lead = new Lead();
 
-        $lead->area = $request->area;
-        $lead->phone = $request->phone;
-        $lead->running_leads = $request->running_leads;
-        $lead->user_id = $request->user_id;
+        $lead->number = $request->number;
+        $lead->user_id = $userId;
         $lead->save();
         return response()->json([
             "message" => "Success",

@@ -15,9 +15,7 @@ class CreateLeadsTable extends Migration
     {
         Schema::create('leads', function (Blueprint $table) {
             $table->id();
-            $table->string('area');
-            $table->string('running_leads')->nullable();
-            $table->string('phone');
+            $table->string('number');
             $table->foreignId('user_id')->onDelete('cascade');
             $table->timestamps();
         });
