@@ -17,7 +17,15 @@ class AdminController extends Controller
 
     public function getUser($user_id)
     {
-        $user = User::find($user_id);
+        $user = User::where('id',$user_id)
+        ->leftjoin('subdistricts', function ($join) {
+            $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+        })->select('users.*','district_id','subdistrict')
+        ->leftjoin('districts', function ($join) {
+            $join->on('subdistricts.district_id', '=', 'districts.id');
+        })->select('users.*','subdistrict','district')
+        ->get();
+        
         if (is_null($user)) {
             return response()->json(["message" => "No users available"], 404);
         }
@@ -33,15 +41,7 @@ class AdminController extends Controller
     {
 
         $userId = auth()->user()->id;
-        // $user = User::where('id', $userId)->first();
-        // if ($user->role != 'Admin') {
-        //     return  response()->json(
-        //         [
-        //             "message" => 'No Permission',
-        //         ],
-        //         404
-        //     );
-        // }
+
         $users = User::all();
         if ($users->isEmpty()) {
             return response()->json(["message" => "No users available"], 404);

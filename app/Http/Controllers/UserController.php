@@ -247,12 +247,27 @@ class UserController extends Controller
     //User Profile Api -GET
     public function profile()
     {
+        // ->leftjoin('subdistricts', function ($join) {
+        //     $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+        // })->select('users.*','district_id','subdistrict')
+        // ->leftjoin('districts', function ($join) {
+        //     $join->on('subdistricts.district_id', '=', 'districts.id');
+        // })->select('users.*','subdistrict','district')
 
-        $user_data = auth()->user();
+
+        $user = User::where('users.id',auth()->user()->id)->leftjoin('subdistricts', 'users.subdistrict_id', '=', 'subdistricts.id')
+        ->select('subdistrict','district')
+        ->leftjoin('districts', 'subdistricts.district_id', '=', 'districts.id')
+        ->select('users.*','subdistrict','district')
+        ->get();
+
+    //     $filtered = $user->filter(function ($value, $key)  {
+    //         return $value['id'] == auth()->user()->id;
+    //    });
 
         return response()->json([
             "message" => "User Profile data",
-            "data" => $user_data
+            "data" => $user
         ], 200);
     }
 
@@ -797,18 +812,8 @@ class UserController extends Controller
         //     return response()->json(["message" => $error], 401);
         // }
         // $users = User::where('role','Painter')->orwhere('role','Dealer')->get();
-        $users = User::where('role', '<>', 'Admin');
-        //
-        // $users = $users->get();
+        $users = User::where('role', '<>', 'Admin')->where('users.id', '<>',  auth()->user()->id);
 
-
-        // return response()->json(
-        //     [
-        //         "message" => 'success',
-        //         "users" => $users
-        //     ],
-        //     200
-        // );
 
         if (!is_null($request->district)) {
             $district = $request->district;
@@ -847,14 +852,11 @@ class UserController extends Controller
 
         $users = $users->get();
 
-        $filtered = $users->filter(function ($value, $key)  {
-             return $value['id'] != auth()->user()->id;
-        });
 
         return response()->json(
             [
                 "message" => 'success',
-                "users" => $filtered
+                "users" => $users
             ],
             200
         );
