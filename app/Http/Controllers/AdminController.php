@@ -17,7 +17,7 @@ class AdminController extends Controller
 
     public function getUser($user_id)
     {
-        $user = User::where('id',$user_id)
+        $user = User::where('users.id',$user_id)
         ->leftjoin('subdistricts', function ($join) {
             $join->on('users.subdistrict_id', '=', 'subdistricts.id');
         })->select('users.*','district_id','subdistrict')
@@ -25,7 +25,7 @@ class AdminController extends Controller
             $join->on('subdistricts.district_id', '=', 'districts.id');
         })->select('users.*','subdistrict','district')
         ->get();
-        
+
         if (is_null($user)) {
             return response()->json(["message" => "No users available"], 404);
         }
