@@ -801,7 +801,7 @@ class UserController extends Controller
         if(count($request->all()) == 0)
         {
             return response()->json(["message" => "No query given"], 404);
-        
+
         $users = User::where('role', '<>', 'Admin')->where('users.id', '<>',  auth()->user()->id);
 
 
@@ -853,34 +853,34 @@ class UserController extends Controller
     }
 
 
-    public function getDistrictsSubdistricts(Request $request)
-    {
-        $districts = District::all();
-        $subdistricts = Subdistrict::all();
-        return response()->json(
-            [
-                "message" => 'success',
-                "districts" => $districts,
-                "subdistricts" => $subdistricts
-            ],
-            200
-        );
-    }
-    public function getSubDistricts(Request $request, $districtId)
-    {
+    // public function getDistrictsSubdistricts(Request $request)
+    // {
+    //     $districts = District::all();
+    //     $subdistricts = Subdistrict::all();
+    //     return response()->json(
+    //         [
+    //             "message" => 'success',
+    //             "districts" => $districts,
+    //             "subdistricts" => $subdistricts
+    //         ],
+    //         200
+    //     );
+    // }
+    // public function getSubDistricts(Request $request, $districtId)
+    // {
 
 
 
-        $subdistricts = Subdistrict::where('district_id', $districtId)->get();
-        if ($subdistricts->isEmpty()) {
-            return response()->json(["message" => "No subdistrict found"], 404);
-        }
-        return response()->json(
-            [
-                "message" => 'success',
-                "subdistricts" => $subdistricts
-            ],
-            200
-        );
-    }
+    //     $subdistricts = Subdistrict::where('district_id', $districtId)->get();
+    //     if ($subdistricts->isEmpty()) {
+    //         return response()->json(["message" => "No subdistrict found"], 404);
+    //     }
+    //     return response()->json(
+    //         [
+    //             "message" => 'success',
+    //             "subdistricts" => $subdistricts
+    //         ],
+    //         200
+    //     );
+    // }
 }
