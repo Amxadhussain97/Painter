@@ -255,15 +255,15 @@ class UserController extends Controller
         // })->select('users.*','subdistrict','district')
 
 
-        $user = User::where('users.id',auth()->user()->id)->leftjoin('subdistricts', 'users.subdistrict_id', '=', 'subdistricts.id')
-        ->select('subdistrict','district')
-        ->leftjoin('districts', 'subdistricts.district_id', '=', 'districts.id')
-        ->select('users.*','subdistrict','district')
-        ->get();
+        $user = User::where('users.id', auth()->user()->id)->leftjoin('subdistricts', 'users.subdistrict_id', '=', 'subdistricts.id')
+            ->select('subdistrict', 'district')
+            ->leftjoin('districts', 'subdistricts.district_id', '=', 'districts.id')
+            ->select('users.*', 'subdistrict', 'district')
+            ->get();
 
-    //     $filtered = $user->filter(function ($value, $key)  {
-    //         return $value['id'] == auth()->user()->id;
-    //    });
+        //     $filtered = $user->filter(function ($value, $key)  {
+        //         return $value['id'] == auth()->user()->id;
+        //    });
 
         return response()->json([
             "message" => "User Profile data",
@@ -798,89 +798,90 @@ class UserController extends Controller
     {
 
 
-        if(count($request->all()) == 0)
-        {
+        if (count($request->all()) == 0) {
             return response()->json(["message" => "No query given"], 404);
-
-        $users = User::where('role', '<>', 'Admin')->where('users.id', '<>',  auth()->user()->id);
-
-
-        if (!is_null($request->district)) {
-            $district = $request->district;
-            $users = $users->whereHas('subdistrict.district', function ($q) use ($district) {
-                $q->where('district', '=', $district);
-            });
         }
 
+            $users = User::where('role', '<>', 'Admin')->where('users.id', '<>',  auth()->user()->id);
 
 
-        if (!is_null($request->subdistrict)) {
-            $subdistrict = $request->subdistrict;
-            $users = $users->whereHas('subdistrict', function ($q) use ($subdistrict) {
-                $q->where('subdistrict', '=', $subdistrict);
-            });
-        }
-
-        if (!is_null($request->type)) {
-            $type = $request->type;
-            if ($type) {
-                $users = $users->where('role', $type);
+            if (!is_null($request->district)) {
+                $district = $request->district;
+                $users = $users->whereHas('subdistrict.district', function ($q) use ($district) {
+                    $q->where('district', '=', $district);
+                });
             }
-        }
-        if (!is_null($request->q)) {
-            $users = $users->where('name', 'like', '%' . $request->q . '%');
-        }
 
 
 
-        $users = $users->leftjoin('subdistricts', function ($join) {
-            $join->on('users.subdistrict_id', '=', 'subdistricts.id');
-        })->select('users.*','district_id','subdistrict')
-        ->leftjoin('districts', function ($join) {
-            $join->on('subdistricts.district_id', '=', 'districts.id');
-        })->select('users.*','subdistrict','district');
+            if (!is_null($request->subdistrict)) {
+                $subdistrict = $request->subdistrict;
+                $users = $users->whereHas('subdistrict', function ($q) use ($subdistrict) {
+                    $q->where('subdistrict', '=', $subdistrict);
+                });
+            }
 
-        $users = $users->get();
+            if (!is_null($request->type)) {
+                $type = $request->type;
+                if ($type) {
+                    $users = $users->where('role', $type);
+                }
+            }
+            if (!is_null($request->q)) {
+                $users = $users->where('name', 'like', '%' . $request->q . '%');
+            }
 
 
+
+            $users = $users->leftjoin('subdistricts', function ($join) {
+                $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+            })->select('users.*', 'district_id', 'subdistrict')
+                ->leftjoin('districts', function ($join) {
+                    $join->on('subdistricts.district_id', '=', 'districts.id');
+                })->select('users.*', 'subdistrict', 'district');
+
+            $users = $users->get();
+
+
+            return response()->json(
+                [
+                    "message" => 'success',
+                    "users" => $users
+                ],
+                200
+            );
+
+    }
+
+
+    public function getDistrictsSubdistricts(Request $request)
+    {
+        $districts = District::all();
+        $subdistricts = Subdistrict::all();
         return response()->json(
             [
                 "message" => 'success',
-                "users" => $users
+                "districts" => $districts,
+                "subdistricts" => $subdistricts
             ],
             200
         );
     }
-
-
-    // public function getDistrictsSubdistricts(Request $request)
-    // {
-    //     $districts = District::all();
-    //     $subdistricts = Subdistrict::all();
-    //     return response()->json(
-    //         [
-    //             "message" => 'success',
-    //             "districts" => $districts,
-    //             "subdistricts" => $subdistricts
-    //         ],
-    //         200
-    //     );
-    // }
-    // public function getSubDistricts(Request $request, $districtId)
-    // {
+    public function getSubDistricts(Request $request, $districtId)
+    {
 
 
 
-    //     $subdistricts = Subdistrict::where('district_id', $districtId)->get();
-    //     if ($subdistricts->isEmpty()) {
-    //         return response()->json(["message" => "No subdistrict found"], 404);
-    //     }
-    //     return response()->json(
-    //         [
-    //             "message" => 'success',
-    //             "subdistricts" => $subdistricts
-    //         ],
-    //         200
-    //     );
-    // }
+        $subdistricts = Subdistrict::where('district_id', $districtId)->get();
+        if ($subdistricts->isEmpty()) {
+            return response()->json(["message" => "No subdistrict found"], 404);
+        }
+        return response()->json(
+            [
+                "message" => 'success',
+                "subdistricts" => $subdistricts
+            ],
+            200
+        );
+    }
 }
