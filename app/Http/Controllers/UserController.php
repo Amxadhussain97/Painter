@@ -801,17 +801,7 @@ class UserController extends Controller
         if(count($request->all()) == 0)
         {
             return response()->json(["message" => "No query given"], 404);
-        }
-        // $rules = [
-        //     'search' => 'required | min:2'
-        // ];
-
-        // $validator = Validator::make($request->all(), $rules);
-        // if ($validator->fails()) {
-        //     $error = $validator->errors()->all()[0];
-        //     return response()->json(["message" => $error], 401);
-        // }
-        // $users = User::where('role','Painter')->orwhere('role','Dealer')->get();
+        
         $users = User::where('role', '<>', 'Admin')->where('users.id', '<>',  auth()->user()->id);
 
 
