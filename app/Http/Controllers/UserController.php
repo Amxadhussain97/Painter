@@ -162,7 +162,7 @@ class UserController extends Controller
         //         ], 401);
         // }
 
-        $credentials = request()->validate(['email' => 'required|email']);
+        $credentials = request()->validate(['email' => 'required|email|exists:users,email']);
 
         Password::sendResetLink($credentials);
 
@@ -802,55 +802,54 @@ class UserController extends Controller
             return response()->json(["message" => "No query given"], 404);
         }
 
-            $users = User::where('role', '<>', 'Admin')->where('users.id', '<>',  auth()->user()->id);
+        $users = User::where('role', '<>', 'Admin')->where('users.id', '<>',  auth()->user()->id);
 
 
-            if (!is_null($request->district)) {
-                $district = $request->district;
-                $users = $users->whereHas('subdistrict.district', function ($q) use ($district) {
-                    $q->where('district', '=', $district);
-                });
+        if (!is_null($request->district)) {
+            $district = $request->district;
+            $users = $users->whereHas('subdistrict.district', function ($q) use ($district) {
+                $q->where('district', '=', $district);
+            });
+        }
+
+
+
+        if (!is_null($request->subdistrict)) {
+            $subdistrict = $request->subdistrict;
+            $users = $users->whereHas('subdistrict', function ($q) use ($subdistrict) {
+                $q->where('subdistrict', '=', $subdistrict);
+            });
+        }
+
+        if (!is_null($request->type)) {
+            $type = $request->type;
+            if ($type) {
+                $users = $users->where('role', $type);
             }
+        }
+        if (!is_null($request->q)) {
+            $users = $users->where('name', 'like', '%' . $request->q . '%');
+        }
 
 
 
-            if (!is_null($request->subdistrict)) {
-                $subdistrict = $request->subdistrict;
-                $users = $users->whereHas('subdistrict', function ($q) use ($subdistrict) {
-                    $q->where('subdistrict', '=', $subdistrict);
-                });
-            }
+        $users = $users->leftjoin('subdistricts', function ($join) {
+            $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+        })->select('users.*', 'district_id', 'subdistrict')
+            ->leftjoin('districts', function ($join) {
+                $join->on('subdistricts.district_id', '=', 'districts.id');
+            })->select('users.*', 'subdistrict', 'district');
 
-            if (!is_null($request->type)) {
-                $type = $request->type;
-                if ($type) {
-                    $users = $users->where('role', $type);
-                }
-            }
-            if (!is_null($request->q)) {
-                $users = $users->where('name', 'like', '%' . $request->q . '%');
-            }
+        $users = $users->get();
 
 
-
-            $users = $users->leftjoin('subdistricts', function ($join) {
-                $join->on('users.subdistrict_id', '=', 'subdistricts.id');
-            })->select('users.*', 'district_id', 'subdistrict')
-                ->leftjoin('districts', function ($join) {
-                    $join->on('subdistricts.district_id', '=', 'districts.id');
-                })->select('users.*', 'subdistrict', 'district');
-
-            $users = $users->get();
-
-
-            return response()->json(
-                [
-                    "message" => 'success',
-                    "users" => $users
-                ],
-                200
-            );
-
+        return response()->json(
+            [
+                "message" => 'success',
+                "users" => $users
+            ],
+            200
+        );
     }
 
 
