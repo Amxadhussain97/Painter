@@ -162,9 +162,17 @@ class UserController extends Controller
         //         ], 401);
         // }
 
-        $credentials = request()->validate(['email' => 'required|email|exists:users,email']);
+        $rules = [
+            'phone' => 'required|exists:users,email',
+        ];
 
-        Password::sendResetLink($credentials);
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 401);
+        }
+
+        Password::sendResetLink($request->email);
 
         return response()->json(["msg" => 'Reset password link sent on your email id.']);
     }
