@@ -163,7 +163,7 @@ class UserController extends Controller
         // }
 
         $rules = [
-            'phone' => 'required|exists:users,email',
+            'email' => 'required|exists:users,email',
         ];
 
         $validator = Validator::make($request->all(), $rules);
