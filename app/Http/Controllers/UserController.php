@@ -172,7 +172,10 @@ class UserController extends Controller
             return response()->json(["message" => $error], 401);
         }
 
-        Password::sendResetLink($request->email);
+
+        $credentials = request()->validate(['email' => 'required|email']);
+
+        Password::sendResetLink($credentials);
 
         return response()->json(["msg" => 'Reset password link sent on your email id.']);
     }
