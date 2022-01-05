@@ -220,8 +220,8 @@ class GalleryController extends Controller
         $photo->image_id = 'Photos/' . $filename;
         $photo->save();
         return response()->json([
-            "message" => "Updated Successfully"
-        ], 204);
+            "message" => "success"
+        ], 201);
     }
 
 
