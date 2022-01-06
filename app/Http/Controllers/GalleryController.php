@@ -14,10 +14,11 @@ class GalleryController extends Controller
     public function getUserPhotos(Request $request, $galleryId)
     {
 
-        $photos  = Photo::where('gallery_id', $galleryId)->get();
-        if (!$photos->count()) {
+        $photos  = Photo::where('gallery_id', $galleryId)->first();
+        if (is_null($photos)) {
             return response()->json(["message" => "No photo available"], 404);
         }
+        $photos  = Photo::where('gallery_id', $galleryId)->get();
         return response()->json(
             [
                 'message' => 'success',
