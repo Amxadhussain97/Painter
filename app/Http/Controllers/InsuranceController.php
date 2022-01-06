@@ -44,7 +44,7 @@ class InsuranceController extends Controller
             $r,
             [
                 'name' => 'required|max:255|min:3',
-                'file_id' => 'required|mimes:doc,docx,pdf,txt',
+                'file_id' => 'required|mimes:pdf|max:3048',
             ]
         );
         if ($validator->fails()) {
@@ -76,7 +76,7 @@ class InsuranceController extends Controller
         // $userId = $request->user_id;
         $insurance = Insurance::find($insuranceId);
 
-        if (is_null($insurance) ) {
+        if (is_null($insurance)) {
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         $rules = [
