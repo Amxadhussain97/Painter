@@ -15,6 +15,7 @@ class GalleryController extends Controller
     {
 
         $photos  = Photo::where('gallery_id', $galleryId)->first();
+        dd($photos);
         if (is_null($photos)) {
             return response()->json(["message" => "No photo available"], 404);
         }
