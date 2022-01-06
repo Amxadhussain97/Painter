@@ -15,7 +15,7 @@ class GalleryController extends Controller
     {
 
         $photos  = Photo::where('gallery_id', $galleryId)->get();
-        if ($photos->isEmpty()) {
+        if (!$photos->count()) {
             return response()->json(["message" => "No photo available"], 404);
         }
         return response()->json(
