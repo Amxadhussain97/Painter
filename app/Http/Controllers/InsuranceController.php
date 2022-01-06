@@ -108,7 +108,7 @@ class InsuranceController extends Controller
                 "message" => "Updated Successfully",
                 "insurance" => $insurance,
             ],
-            204
+            201
         );
     }
 

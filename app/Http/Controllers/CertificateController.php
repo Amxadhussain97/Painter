@@ -124,7 +124,7 @@ class CertificateController extends Controller
         return response()->json([
             "message" => 'Updated Successfully',
             "certificate" => $certificate,
-        ], 204);
+        ], 201);
     }
 
     /**
