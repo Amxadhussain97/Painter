@@ -78,7 +78,7 @@ class EptoolController extends Controller
             return response()->json(["message" => $error], 401);
         }
         $eptool = new Eptool();
-  
+
 
         $eptool->name = $request->name;
         $eptool->model = $request->model;
@@ -358,7 +358,7 @@ class EptoolController extends Controller
         $photo->save();
         return response()->json([
             "message" => "Updated Successfully"
-        ], 204);
+        ], 201);
     }
 
     public function deleteEpphoto($eptoolId, $EpphotoId)
