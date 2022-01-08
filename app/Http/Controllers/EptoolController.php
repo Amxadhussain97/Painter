@@ -356,8 +356,11 @@ class EptoolController extends Controller
         $file->move(public_path('EpPhotos'), $filename);
         $photo->image_id = 'EpPhotos/' . $filename;
         $photo->save();
+        // return response()->json([
+        //     "message" => "Updated Successfully"
+        // ], 201);
         return response()->json([
-            "message" => "Updated Successfully"
+            "message" => "success"
         ], 201);
     }
 
