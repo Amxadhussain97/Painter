@@ -44,8 +44,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 
     Route::get("districts", [UserController::class, 'getDistricts']);
-    Route::get("subdistricts", [UserController::class, 'getSubDistricts']);
-    
+    // Route::get("subdistricts", [UserController::class, 'getSubDistricts']);
+
     Route::group([
         'middleware' => ['userMiddleware']
     ], function () {

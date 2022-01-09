@@ -49,13 +49,13 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function getSubDistricts()
-    {
-        $subdistrict = Subdistrict::all();
-        return response([
-            'subdistrict' =>  $subdistrict
-        ], 200);
-    }
+    // public function getSubDistricts()
+    // {
+    //     $subdistrict = Subdistrict::all();
+    //     return response([
+    //         'subdistrict' =>  $subdistrict
+    //     ], 200);
+    // }
 
 
     public function showResetPasswordForm($token)
@@ -867,21 +867,21 @@ class UserController extends Controller
             200
         );
     }
-    // public function getSubDistricts(Request $request, $districtId)
-    // {
+    public function getSubDistricts(Request $request, $districtId)
+    {
 
 
 
-    //     $subdistricts = Subdistrict::where('district_id', $districtId)->get();
-    //     if ($subdistricts->isEmpty()) {
-    //         return response()->json(["message" => "No subdistrict found"], 404);
-    //     }
-    //     return response()->json(
-    //         [
-    //             "message" => 'success',
-    //             "subdistricts" => $subdistricts
-    //         ],
-    //         200
-    //     );
-    // }
+        $subdistricts = Subdistrict::where('district_id', $districtId)->get();
+        if ($subdistricts->isEmpty()) {
+            return response()->json(["message" => "No subdistrict found"], 404);
+        }
+        return response()->json(
+            [
+                "message" => 'success',
+                "subdistricts" => $subdistricts
+            ],
+            200
+        );
+    }
 }
