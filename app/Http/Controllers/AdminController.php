@@ -17,14 +17,14 @@ class AdminController extends Controller
 
     public function getUser($user_id)
     {
-        $user = User::where('users.id',$user_id)
-        ->leftjoin('subdistricts', function ($join) {
-            $join->on('users.subdistrict_id', '=', 'subdistricts.id');
-        })->select('users.*','district_id','subdistrict')
-        ->leftjoin('districts', function ($join) {
-            $join->on('subdistricts.district_id', '=', 'districts.id');
-        })->select('users.*','subdistrict','district')
-        ->get();
+        $user = User::where('users.id', $user_id)
+            ->leftjoin('subdistricts', function ($join) {
+                $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+            })->select('users.*', 'district_id', 'subdistrict')
+            ->leftjoin('districts', function ($join) {
+                $join->on('subdistricts.district_id', '=', 'districts.id');
+            })->select('users.*', 'subdistrict', 'district')
+            ->get();
 
         if (is_null($user)) {
             return response()->json(["message" => "No users available"], 404);
@@ -37,20 +37,37 @@ class AdminController extends Controller
         );
     }
 
-    public function getUsers()
+    public function getUsers(Request $request)
     {
 
         $userId = auth()->user()->id;
 
-        $users = User::all();
-        if ($users->isEmpty()) {
+        if ($request->user) {
+            $user = User::where('users.id', $request->user)
+                ->leftjoin('subdistricts', function ($join) {
+                    $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+                })->select('users.*', 'district_id', 'subdistrict')
+                ->leftjoin('districts', function ($join) {
+                    $join->on('subdistricts.district_id', '=', 'districts.id');
+                })->select('users.*', 'subdistrict', 'district')
+                ->get();
+        } else {
+            $user = User::leftjoin('subdistricts', function ($join) {
+                $join->on('users.subdistrict_id', '=', 'subdistricts.id');
+            })->select('users.*', 'district_id', 'subdistrict')
+                ->leftjoin('districts', function ($join) {
+                    $join->on('subdistricts.district_id', '=', 'districts.id');
+                })->select('users.*', 'subdistrict', 'district')
+                ->get();
+        }
+        if ($user->isEmpty()) {
             return response()->json(["message" => "No users available"], 404);
         }
 
         return response()->json(
             [
                 "message" => 'success',
-                "users" => $users
+                "users" => $user
             ],
             200
         );
