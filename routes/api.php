@@ -40,14 +40,14 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get("profile", [UserController::class, 'profile']);
     Route::get("logout", [UserController::class, 'logout']);
     Route::post("profile", [UserController::class, 'updateProfile']);
-
+    Route::get('users/{User::id}', [AdminController::class, 'getUser']); // TO GET AN USER
 
     Route::group([
         'middleware' => ['userMiddleware']
     ], function () {
         Route::get("users", [AdminController::class, 'getUsers']); // TO GET ALL USERS
         Route::post('users/{User::id}', [AdminController::class, 'updateUser']); // TO UPDATE AN USER
-        Route::get('users/{User::id}', [AdminController::class, 'getUser']); // TO UPDATE AN USER
+
 
         Route::post('eptools', [EptoolController::class, 'postEptool']); // TO POST AN EPTOOL
         Route::get('eptools', [EptoolController::class, 'getEptools']); // TO GET EPTOOL OF AN USER
