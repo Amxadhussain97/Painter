@@ -46,7 +46,7 @@ class UserController extends Controller
         $district = District::all();
         return response([
             'district' =>  $district
-        ], 500);
+        ], 200);
     }
 
     public function getSubDistricts()
@@ -54,7 +54,7 @@ class UserController extends Controller
         $subdistrict = Subdistrict::all();
         return response([
             'subdistrict' =>  $subdistrict
-        ], 500);
+        ], 200);
     }
 
 
