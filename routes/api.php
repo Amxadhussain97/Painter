@@ -40,8 +40,12 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get("profile", [UserController::class, 'profile']);
     Route::get("logout", [UserController::class, 'logout']);
     Route::post("profile", [UserController::class, 'updateProfile']);
-    Route::get('users/{User::id}', [AdminController::class, 'getUser']); // TO GET AN USER
+    Route::get('users/{User::id}', [AdminController::class, 'getUser']); // TO GET AN USE
 
+
+    Route::get("districts", [UserController::class, 'getDistricts']);
+    Route::get("subdistricts", [UserController::class, 'getSubDistricts']);
+    
     Route::group([
         'middleware' => ['userMiddleware']
     ], function () {

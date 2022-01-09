@@ -41,6 +41,22 @@ class UserController extends Controller
     // {
     //     $this->middleware('auth:api');
     // }
+    public function getDistricts()
+    {
+        $district = District::all();
+        return response([
+            'district' =>  $district
+        ], 500);
+    }
+
+    public function getSubDistricts()
+    {
+        $subdistrict = Subdistrict::all();
+        return response([
+            'subdistrict' =>  $subdistrict
+        ], 500);
+    }
+
 
     public function showResetPasswordForm($token)
     {
@@ -80,33 +96,7 @@ class UserController extends Controller
         return back()->withInput()->with('other', __($status));
 
 
-
-
-
-
-        //  $request->validate([
-        //      'email' => 'required|email|exists:users',
-        //      'password' => 'required|string|min:6|confirmed',
-        //      'password_confirmation' => 'required'
-        //  ]);
-
-        //  $updatePassword = DB::table('password_resets')
-        //                      ->where([
-        //                        'email' => $request->email,
-        //                        'token' => $request->token
-        //                      ])
-        //                      ->first();
-
-        //  if(!$updatePassword){
         return back()->withInput()->with('message', 'Invalid token!');
-        //  }
-
-        //  $user = User::where('email', $request->email)
-        //              ->update(['password' => Hash::make($request->password)]);
-
-        //  DB::table('password_resets')->where(['email'=> $request->email])->delete();
-
-        //  return redirect('/login')->with('message', 'Your password has been changed!');
     }
 
     public function reset(Request $request)
@@ -877,21 +867,21 @@ class UserController extends Controller
             200
         );
     }
-    public function getSubDistricts(Request $request, $districtId)
-    {
+    // public function getSubDistricts(Request $request, $districtId)
+    // {
 
 
 
-        $subdistricts = Subdistrict::where('district_id', $districtId)->get();
-        if ($subdistricts->isEmpty()) {
-            return response()->json(["message" => "No subdistrict found"], 404);
-        }
-        return response()->json(
-            [
-                "message" => 'success',
-                "subdistricts" => $subdistricts
-            ],
-            200
-        );
-    }
+    //     $subdistricts = Subdistrict::where('district_id', $districtId)->get();
+    //     if ($subdistricts->isEmpty()) {
+    //         return response()->json(["message" => "No subdistrict found"], 404);
+    //     }
+    //     return response()->json(
+    //         [
+    //             "message" => 'success',
+    //             "subdistricts" => $subdistricts
+    //         ],
+    //         200
+    //     );
+    // }
 }
