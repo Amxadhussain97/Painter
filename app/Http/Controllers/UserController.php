@@ -536,7 +536,23 @@ class UserController extends Controller
             //     }
 
             // }
-            $linkeduser->subdistrict_id = $request->subdistrict_id;
+            if ($request->district) {
+
+                $district = District::where('district', $request->district)->first();
+                if (is_null($district)) {
+                    $district = new District();
+                    $district->district = $request->district;
+                    $district->save();
+                }
+                $subdistrict = Subdistrict::where('district_id', $district->id)->where('subdistrict', $request->subdistrict)->first();
+                if (is_null($subdistrict)) {
+                    $subdistrict = new Subdistrict();
+                    $subdistrict->subdistrict = $request->subdistrict;
+                    $subdistrict->district_id = $district->id;
+                    $subdistrict->save();
+                }
+                $linkeduser->subdistrict_id = $subdistrict->id;
+            }
             $linkeduser->save();
 
 
