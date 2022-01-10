@@ -503,7 +503,6 @@ class UserController extends Controller
             'name' => 'max:255|min:3',
             'area' => 'max:255|min:3',
             'phone' => 'required|max:255|min:5',
-            'email' => 'email|unique:users',
             'link' => 'required'
         ];
 
@@ -521,22 +520,23 @@ class UserController extends Controller
             $linkeduser->phone = $request->phone;
             $linkeduser->email = $request->email;
 
-            if ($request->district) {
-                $district = District::where('district', $request->district)->first();
-                if (is_null($district)) {
-                    $district = new District();
-                    $district->district = $request->district;
-                    $district->save();
-                }
-                $subdistrict = Subdistrict::where('district_id', $district->id)->where('subdistrict', $request->subdistrict)->first();
-                if (is_null($subdistrict)) {
-                    $subdistrict = new Subdistrict();
-                    $subdistrict->subdistrict = $request->subdistrict;
-                    $subdistrict->district_id = $district->id;
-                    $subdistrict->save();
-                }
-                $linkeduser->subdistrict_id = $subdistrict->id;
-            }
+            // if ($request->district) {
+            //     $district = District::where('district', $request->district)->first();
+            //     if (is_null($district)) {
+            //         $district = new District();
+            //         $district->district = $request->district;
+            //         $district->save();
+            //     }
+            //     $subdistrict = Subdistrict::where('district_id', $district->id)->where('subdistrict', $request->subdistrict)->first();
+            //     if (is_null($subdistrict)) {
+            //         $subdistrict = new Subdistrict();
+            //         $subdistrict->subdistrict = $request->subdistrict;
+            //         $subdistrict->district_id = $district->id;
+            //         $subdistrict->save();
+            //     }
+
+            // }
+            $linkeduser->subdistrict_id = $request->subdistrict_id;
             $linkeduser->save();
 
 
