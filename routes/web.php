@@ -22,3 +22,7 @@ Route::get('/', function () {
 
 Route::get('reset-password/{token}', [UserController::class, 'showResetPasswordForm'])->name('reset.password.get');
 Route::post('reset-password', [UserController::class, 'submitResetPasswordForm'])->name('reset.password.post');
+
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+});

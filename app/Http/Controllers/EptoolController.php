@@ -283,7 +283,7 @@ class EptoolController extends Controller
         $validator = Validator::make(
             $r,
             [
-                'image_id.*' => 'mimes:jpeg,jpg,png,gif,csv,txt,pdf',
+                'image_id.*' => 'mimes:jpeg,jpg,png',
                 'eptool_id' => 'required|exists:eptools,id',
 
             ]
