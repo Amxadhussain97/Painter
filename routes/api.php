@@ -33,7 +33,7 @@ Route::post('forgot', [UserController::class, 'forgot']);
 
 
 
-Route::group(["middleware" => ['jwt.verify']], function () {
+Route::group(['middleware' => ['jwt.verify']], function ($router) {
 
 // Route::group(['middleware' => ['auth:api']], function () {
 

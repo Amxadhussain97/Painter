@@ -1,26 +1,24 @@
 <?php
 
 namespace App\Http\Middleware;
-
 use Closure;
 use JWTAuth;
 use Exception;
-use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
+use Illuminate\Http\Request;
+use Tymon\JWTAuth\JWTAuth as JWTAuthJWTAuth;
 
-class JwtMiddleware extends BaseMiddleware
+class JwtMiddleware
 {
-
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
+     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         try {
-
             $user = JWTAuth::parseToken()->authenticate();
         } catch (Exception $e) {
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
@@ -34,3 +32,4 @@ class JwtMiddleware extends BaseMiddleware
         return $next($request);
     }
 }
+

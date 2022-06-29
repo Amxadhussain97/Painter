@@ -163,7 +163,7 @@ class UserController extends Controller
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 422);
         }
-
+        
 
         $credentials = request()->validate(['email' => 'required|email']);
 
