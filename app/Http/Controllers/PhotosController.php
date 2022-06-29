@@ -58,7 +58,7 @@ class PhotosController extends Controller
                 'name' => 'image|max:2048',
             ]);
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            return response()->json(['error'=>$validator->errors()], 422);
         }
         $photo = new Photo();
         if($request->file('name'))
@@ -120,12 +120,14 @@ class PhotosController extends Controller
         $validator = Validator::make($request->all(),$rules);
 
         if($validator->fails()){
-            return response()->json($validator->errors(),400);
+            return response()->json($validator->errors(),422);
         }
         if(isset($photo['name']))
         {
-            $path = public_path()."/Gallery/".$photo->name;
-            unlink($path);
+            if(file_exists(public_path()."/Gallery/".$photo->name)){
+                //delete file
+                unlink(public_path()."/Gallery/".$photo->name);
+            }
         }
         $file = $request->file('name');
         $filename = time().'.'.$file->extension();
@@ -152,8 +154,11 @@ class PhotosController extends Controller
         }
         if(isset($photos['name']))
         {
-            $path = public_path()."/Gallery/".$photos->name;
-            unlink($path);
+            //check if file exists
+            if(file_exists(public_path()."/Gallery/".$photo->name)){
+                //delete file
+                unlink(public_path()."/Gallery/".$photo->name);
+            }
         }
         $photo->delete();
         return response()->json(["messege" =>"Deleted"],200);

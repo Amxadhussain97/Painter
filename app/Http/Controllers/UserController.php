@@ -12,8 +12,9 @@ use App\Models\LinkedUser;
 use App\Models\Subdistrict;
 use App\Models\Subuser;
 use Exception;
+use Facade\FlareClient\Http\Response as HttpResponse;
 use GuzzleHttp\Psr7\Message as Psr7Message;
-use http\Env\Response;
+use Illuminate\Auth\Access\Response as AccessResponse;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Nette\Schema\Message as SchemaMessage;
 use Illuminate\Auth\Events\PasswordReset;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Message as MimeMessage;
 use Illuminate\Validation\Rules\Password as RulesPassword;
 use Illuminate\Support\Str;
@@ -159,7 +161,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
 
@@ -184,7 +186,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
         $user = User::where('phone', $request->phone)->first();
@@ -222,27 +224,46 @@ class UserController extends Controller
     public function login(Request $request)
     {
 
+        $credentials = $request->only('email', 'password');
 
-        $request->validate([
-            "email" => "required|email",
-            "password" => "required"
+        //valid credential
+        $validator = Validator::make($credentials, [
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:6|max:50'
         ]);
-
-        // verify user +token
-
-        if (!$token = auth()->attempt(["email" => $request->email, "password"  => $request->password])) {
+        if ($validator->fails()) {
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 422);
+        }
+        try {
+            if (!$token = auth()->setTTL(40000)->attempt(['email' => $request->email, 'password' => $request->password])) {
+                // if (!$token = JWTAuth::attempt($credentials, ['exp' => Carbon::now()->addDays(7)->timestamp])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Login credentials are invalid.',
+                ], 400);
+            } else {
+                // $user = JWTAuth::toUser($token);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User logged in successfully',
+                    // 'data' => $user,
+                    'token' => $token
+                ], Response::HTTP_OK);
+            }
+        } catch (JWTException $e) {
+            return $credentials;
             return response()->json([
-                "message" => "Invalid credentials"
-            ], 401);
+                'success' => false,
+                'message' => 'Could not create token.',
+            ], 500);
         }
 
-        //return response
-
+        //Token created, return with success response and jwt token
         return response()->json([
-
-            "message" => "success",
-            "token" => $token
-        ], 201);
+            'success' => true,
+            'token' => $token,
+        ]);
     }
 
     //User Profile Api -GET
@@ -290,7 +311,7 @@ class UserController extends Controller
         // return public_path();
         $user = User::find(auth()->user()->id);
         if (is_null($user)) {
-            return response()->json(["message" => "Record Not Found!"], 404);
+            return response()->json(["message" => "Record Not Found!"],404);
         }
 
 
@@ -298,9 +319,9 @@ class UserController extends Controller
             'name' => 'max:255|min:3',
             'email' => 'email',
             'gender' => 'max:6',
-            'imagePath' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2050',
+            'imagePath' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5000',
             'phone' => 'min:5',
-            'area' => 'max:20|',
+            'area' => 'max:500|min:3',
             'bankName' => 'max:20|',
             'rocket' => 'max:20|',
             'bkash' => 'max:20|',
@@ -312,7 +333,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
         if ($request->file('imagePath')) {
 
@@ -321,7 +342,7 @@ class UserController extends Controller
                 unlink($path);
             }
             $file = $request->file('imagePath');
-            $filename = $file->getClientOriginalName();
+            $filename =time(). $file->getClientOriginalName();
             $file->move(public_path('Photos'), $filename);
             $user->imagePath = "Photos/" . $filename;
         }
@@ -345,8 +366,9 @@ class UserController extends Controller
             $user->save();
         }
 
+       //return json response with 204 code
         return response()->json([
-            "message" => "Updated Successfully"
+            "message" => "User Profile updated successfully"
         ], 204);
     }
 
@@ -367,7 +389,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         } else if ($user->phone == $request->phone) {
             return response()->json(["message" => "Provided phone number can't be matched with your own phone number"], 401);
         } else {
@@ -426,7 +448,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
 
@@ -509,7 +531,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         } else if ($user->phone == $request->phone) {
             return response()->json(["message" => "Provided phone number can't be matched with your own phone number"], 401);
         } else {
@@ -594,7 +616,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
 
@@ -649,7 +671,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         } else if ($user->phone == $request->phone) {
             return response()->json(["message" => "Provided phone number can't be matched with your own phone number"], 401);
         } else {
@@ -722,7 +744,7 @@ class UserController extends Controller
         );
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
         $lead = Lead::where('user_id', $userId)->first();
@@ -779,7 +801,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
 

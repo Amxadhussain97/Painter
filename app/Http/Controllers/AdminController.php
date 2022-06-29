@@ -99,7 +99,7 @@ class AdminController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
         if ($request->file('imagePath')) {
 

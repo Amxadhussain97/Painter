@@ -61,7 +61,7 @@ class CertificateController extends Controller
         );
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
         $certificate = new Certificate();
         if ($request->file('file_id')) {
@@ -105,7 +105,7 @@ class CertificateController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
 

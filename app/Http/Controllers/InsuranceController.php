@@ -44,12 +44,12 @@ class InsuranceController extends Controller
             $r,
             [
                 'name' => 'required|max:255|min:3',
-                'file_id' => 'required|mimes:pdf|max:3048',
+                'file_id' => 'required|mimes:pdf|max:5048',
             ]
         );
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
         $insurance = new Insurance();
@@ -87,7 +87,7 @@ class InsuranceController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
         if ($request->file('file_id')) {

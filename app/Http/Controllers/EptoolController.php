@@ -75,7 +75,7 @@ class EptoolController extends Controller
         );
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
         $eptool = new Eptool();
 
@@ -111,7 +111,7 @@ class EptoolController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
 
@@ -190,7 +190,8 @@ class EptoolController extends Controller
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 401);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 422);
         }
         $tool = Eptool::create($request->all());
         $tool->save();
@@ -246,7 +247,8 @@ class EptoolController extends Controller
 
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            $error = $validator->errors()->all()[0];
+            return response()->json(["message" => $error], 422);
         }
 
         $tool->update($request->all());
@@ -290,7 +292,7 @@ class EptoolController extends Controller
         );
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
 
 
@@ -345,7 +347,7 @@ class EptoolController extends Controller
 
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
-            return response()->json(["message" => $error], 401);
+            return response()->json(["message" => $error], 422);
         }
         if (isset($photo['image_id'])) {
             $path = public_path() . "/" . $photo->image_id;
