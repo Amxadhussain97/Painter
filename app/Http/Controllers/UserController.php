@@ -163,7 +163,7 @@ class UserController extends Controller
             $error = $validator->errors()->all()[0];
             return response()->json(["message" => $error], 422);
         }
-        
+
 
         $credentials = request()->validate(['email' => 'required|email']);
 
@@ -213,7 +213,8 @@ class UserController extends Controller
 
 
 
-        $token = auth()->attempt(["email" => $request->email, "password"  => $request->password]);
+        // $token = auth()->attempt(["email" => $request->email, "password"  => $request->password]);
+        $token = $token = auth()->setTTL(40000)->attempt(['email' => $request->email, 'password' => $request->password]);
         return response()->json([
             "message" => "success",
             "token" => $token,
