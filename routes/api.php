@@ -33,9 +33,9 @@ Route::post('forgot', [UserController::class, 'forgot']);
 
 
 
-Route::group(['middleware' => ['jwt.verify']], function ($router) {
+// Route::group(['middleware' => ['jwt.verify']], function ($router) {
 
-// Route::group(['middleware' => ['auth:api']], function () {
+Route::group(['middleware' => ['auth:api']], function () {
 
     Route::get("profile", [UserController::class, 'profile']);
     Route::get("logout", [UserController::class, 'logout']);
