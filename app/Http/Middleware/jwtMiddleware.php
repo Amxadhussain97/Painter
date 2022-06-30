@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\JWTAuth as JWTAuthJWTAuth;
 
+
 class JwtMiddleware
 {
     /**
