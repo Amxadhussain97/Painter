@@ -50,7 +50,7 @@ class AdminController extends Controller
                 ->leftjoin('districts', function ($join) {
                     $join->on('subdistricts.district_id', '=', 'districts.id');
                 })->select('users.*', 'subdistricts.id as subdistrict_id',
-                'subdistricts.name as subdistrict_name', 'districts.id as district_id', 'districts.name as district_name'
+                'subdistricts.subdistrict', 'districts.id as district_id', 'districts.district'
                 )
                 ->get();
         } else {
@@ -60,7 +60,8 @@ class AdminController extends Controller
                 ->leftjoin('districts', function ($join) {
                     $join->on('subdistricts.district_id', '=', 'districts.id');
                 })->select('users.*', 'subdistricts.id as subdistrict_id',
-                'subdistricts.name as subdistrict_name', 'districts.id as district_id', 'districts.name as district_name')
+                'subdistricts.subdistrict', 'districts.id as district_id', 'districts.district'
+               )
                 ->get();
         }
         if ($user->isEmpty()) {
