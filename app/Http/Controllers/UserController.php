@@ -43,11 +43,13 @@ class UserController extends Controller
     // {
     //     $this->middleware('auth:api');
     // }
-    public function getDistricts()
+    public function getUtility()
     {
-        $district = District::all();
+        $districts = District::all();
+        $subdistricts = Subdistrict::all();
         return response([
-            'district' =>  $district
+            'districts' =>  $districts,
+            'subdistricts' =>  $subdistricts
         ], 200);
     }
 

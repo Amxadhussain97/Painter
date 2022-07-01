@@ -43,7 +43,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('users/{User::id}', [AdminController::class, 'getUser']); // TO GET AN USER
 
 
-    Route::get("districts", [UserController::class, 'getDistricts']);
+    Route::get("utilities", [UserController::class, 'getUtility']);
     // Route::get("subdistricts", [UserController::class, 'getSubDistricts']);
 
     Route::group([
