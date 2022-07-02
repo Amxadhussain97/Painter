@@ -66,9 +66,9 @@ class CertificateController extends Controller
         $certificate = new Certificate();
         if ($request->file('file_id')) {
             $file = $request->file('file_id');
-            $filename =  time() . $file->getClientOriginalName();
+            $filename =time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('Certificates'), $filename);
-            $certificate->file_id = 'Certificates/' . $filename;
+            $certificate->file_id = env('APP_URL') . "/Certificates/" . $filename;
         }
 
         $certificate->name = $request->name;
@@ -111,13 +111,18 @@ class CertificateController extends Controller
 
         if ($request->file('file_id')) {
             if (isset($certificate['file_id'])) {
-                $path = public_path() . "/" . $certificate->file_id;
-                unlink($path);
+                $suffix = substr($certificate->file_id, strpos($certificate->file_id, env('APP_URL')) + strlen(env('APP_URL'))+1);
+                $path = public_path() . "/" . $suffix;
+                if (file_exists($path)) {
+                    unlink($path);
+                }
             }
+            
             $file = $request->file('file_id');
-            $filename =  time() . $file->getClientOriginalName();
+            $filename =time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('Certificates'), $filename);
-            $certificate->file_id = 'Certificates/' .  $filename;
+            $certificate->file_id = env('APP_URL') . "/Certificates/" . $filename;
+
         }
         $certificate->name = is_null($request->name) ? $certificate->name : $request->name;
         $certificate->save();
@@ -141,8 +146,11 @@ class CertificateController extends Controller
             return response()->json(["message" => "Record Not Found!"], 404);
         }
         if (isset($certificate['file_id'])) {
-            $path = public_path() . "/" . $certificate->file_id;
-            unlink($path);
+            $suffix = substr($certificate->file_id, strpos($certificate->file_id, env('APP_URL')) + strlen(env('APP_URL'))+1);
+            $path = public_path() . "/" . $suffix;
+            if (file_exists($path)) {
+                unlink($path);
+            }
         }
         $certificate->delete();
         return response()->json([

@@ -7,7 +7,7 @@ use App\Models\Photo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use File;
-
+$baseurl = env('APP_URL');
 
 class PhotosController extends Controller
 {

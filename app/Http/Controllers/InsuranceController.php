@@ -54,10 +54,11 @@ class InsuranceController extends Controller
 
         $insurance = new Insurance();
         if ($request->file('file_id')) {
+
             $file = $request->file('file_id');
-            $filename =  time() . $file->getClientOriginalName();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('Insurances'), $filename);
-            $insurance->file_id = 'Insurances/' . $filename;
+            $insurance->file_id = env('APP_URL') . "/Insurances/" . $filename;
         }
 
         $insurance->name = $request->name;
@@ -92,13 +93,16 @@ class InsuranceController extends Controller
 
         if ($request->file('file_id')) {
             if (isset($insurance['file_id'])) {
-                $path = public_path() . "/" . $insurance->file_id;
-                unlink($path);
+                $suffix = substr($insurance->file_id, strpos($insurance->file_id, env('APP_URL')) + strlen(env('APP_URL')) + 1);
+                $path = public_path() . "/" . $suffix;
+                if (file_exists($path)) {
+                    unlink($path);
+                }
             }
             $file = $request->file('file_id');
-            $filename =  time() . $file->getClientOriginalName();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('Insurances'), $filename);
-            $insurance->file_id = 'Insurances/' . $filename;
+            $insurance->file_id = env('APP_URL') . "/Insurances/" . $filename;
         }
         $insurance->name = is_null($request->name) ? $insurance->name : $request->name;
 
@@ -128,9 +132,12 @@ class InsuranceController extends Controller
             return response()->json(["message" => "Record Not Found!"], 404);
         }
 
-        if (isset($insurance['file_id'])) {
-            $path = public_path() . "/" . $insurance->file_id;
-            unlink($path);
+        if (isset($insurance['file_id'])){
+            $suffix = substr($insurance->file_id, strpos($insurance->file_id, env('APP_URL')) + strlen(env('APP_URL')) + 1);
+            $path = public_path() . "/" . $suffix;
+            if (file_exists($path)){
+                unlink($path);
+            }
         }
         $insurance->delete();
         return response()->json([

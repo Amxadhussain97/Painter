@@ -166,10 +166,15 @@ class EptoolController extends Controller
 
         $photos = $photo_query->get();
         foreach ($photos as $photo) {
+
             if (isset($photo['image_id'])) {
-                $path = public_path() . "/" . $photo->image_id;
-                unlink($path);
+                $suffix = substr($photo->image_id, strpos($photo->image_id, env('APP_URL')) + strlen(env('APP_URL'))+1);
+                $path = public_path() . "/" . $suffix;
+                if (file_exists($path)) {
+                    unlink($path);
+                }
             }
+
         }
         $photo_query->delete();
         $eptool->delete();
@@ -188,6 +193,7 @@ class EptoolController extends Controller
             'epcategory_id' => 'required|exists:epcategories,id'
 
         ];
+
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             $error = $validator->errors()->all()[0];
@@ -196,6 +202,8 @@ class EptoolController extends Controller
         $tool = Eptool::create($request->all());
         $tool->save();
         return response()->json(Eptool::with('epcategory')->get(), 201);
+
+
     }
 
     /**
@@ -297,12 +305,15 @@ class EptoolController extends Controller
 
 
         foreach ($request->file('image_id') as $file) {
+            
             $epphoto = new Epphoto();
-            $filename =  time() . $file->getClientOriginalName();
+            $filename =  time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('EpPhotos'), $filename);
-            $epphoto->image_id = 'EpPhotos/' . $filename;
+            $epphoto->image_id = env('APP_URL') . "/EpPhotos/" . $filename;
             $epphoto->eptool_id = $eptoolId;
             $epphoto->save();
+
+
         }
 
         $list = Epphoto::where('eptool_id', $eptoolId)->get();
@@ -350,14 +361,21 @@ class EptoolController extends Controller
             return response()->json(["message" => $error], 422);
         }
         if (isset($photo['image_id'])) {
-            $path = public_path() . "/" . $photo->image_id;
-            unlink($path);
+
+            $suffix = substr($photo->image_id, strpos($photo->image_id, env('APP_URL')) + strlen(env('APP_URL'))+1);
+            $path = public_path() . "/" . $suffix;
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
         }
         $file = $request->file('image_id');
-        $filename =  time() . $file->getClientOriginalName();
+        $filename = time().'.'.$file->getClientOriginalExtension();
         $file->move(public_path('EpPhotos'), $filename);
-        $photo->image_id = 'EpPhotos/' . $filename;
+        $photo->image_id = env('APP_URL') . '/EpPhotos/' . $filename;
         $photo->save();
+
+
         // return response()->json([
         //     "message" => "Updated Successfully"
         // ], 201);
@@ -375,8 +393,13 @@ class EptoolController extends Controller
         }
 
         if (isset($photo['image_id'])) {
-            $path = public_path() . "/" . $photo->image_id;
-            unlink($path);
+            $suffix = substr($photo->image_id, strpos($photo->image_id, env('APP_URL')) + strlen(env('APP_URL'))+1);
+            $path = public_path() . "/" . $suffix;
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+
         }
         $photo->delete();
         return response()->json(["messege" => "Deleted successfully"], 204);
